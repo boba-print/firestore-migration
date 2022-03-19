@@ -1,8 +1,8 @@
 import admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
-import { printHistory2MigrationService } from 'migration/service/printHistory2.service';
+import { printHistory2MigrationService } from '../../migration/service/printHistory2.service';
 
-async function printHistory2MigrationController(
+export async function printHistory2MigrationController(
   snap: admin.firestore.DocumentSnapshot,
   ctx: functions.EventContext
 ) {

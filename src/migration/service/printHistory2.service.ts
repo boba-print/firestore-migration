@@ -2,13 +2,13 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '../prisma';
 import admin, { firestore } from 'firebase-admin';
 import * as functions from 'firebase-functions';
-import { Ticket } from 'interface/common';
-import { PrintHistory2, PrintJob } from 'interface/database';
-import { fileUpdater } from 'migration/updater/file.updater';
-import { kioskUpdater } from 'migration/updater/kiosk.updater';
-import { userUpdater } from 'migration/updater/pointTransaction.updater';
+import { Ticket } from '../../interface/common';
+import { PrintHistory2, PrintJob } from '../../interface/database';
+import { fileUpdater } from '../../migration/updater/file.updater';
+import { kioskUpdater } from '../../migration/updater/kiosk.updater';
+import { userUpdater } from '../../migration/updater/pointTransaction.updater';
 import { v4 as uuidv4 } from 'uuid';
-import { printOrderUpdater } from 'migration/updater/printOrder.updater';
+import { printOrderUpdater } from '../../migration/updater/printOrder.updater';
 
 const defaultTicket: Ticket = {
   copies: 1,

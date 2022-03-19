@@ -1,4 +1,4 @@
-import { PrintHistory2 } from 'interface/database';
+import { PrintHistory2 } from '../../interface/database';
 import { Updater } from './base';
 import { prisma } from '../prisma';
 import { Prisma } from '@prisma/client';
