@@ -31,7 +31,7 @@ class KioskUpdater extends Updater<Kiosk> {
       Status: kiosk.status,
       Notice: kiosk.notice,
       WorkHour: kiosk.workHour,
-      PaperTrayCapacity: kiosk.paperTrayCap,
+      PaperTrayCapacity: Number(kiosk.paperTrayCap),
       NumRemainPaper: kiosk.remainPaper,
     };
 

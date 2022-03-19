@@ -53,8 +53,10 @@ export async function printHistory2MigrationService(printHistoryUid: string) {
   await userUpdater.update(userUid);
   await kioskUpdater.update(kioskUid);
   await Promise.all(fileUids.map((fileUid) => fileUpdater.update(fileUid)));
-  await cardUpdater.update(cardHistory.paid.cardUid, userUid);
-
+  if(cardHistoryUid) {
+    await cardUpdater.update(cardHistory.paid.cardUid, userUid);
+  }
+  
   // migrate or update CardHistory2 or PointHistory document
   if (cardHistoryUid) {
     await cardTransactionUpdater.update(cardHistoryUid);

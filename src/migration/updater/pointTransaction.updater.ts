@@ -11,6 +11,14 @@ class PointTransactionUpdater extends Updater<PointHistory> {
   async createOrUpdateWhenExist(pointHistory: PointHistory): Promise<any> {
     const now = new Date();
     const id = pointHistory.uid.substring(0, 40);
+    let pointChanged: number;
+    const { loaded, paid, used } = pointHistory.amount;
+    if (loaded !== 0) {
+      pointChanged = loaded;
+    } else if (used !== 0) {
+      pointChanged = -used;
+    }
+
     const relation: Prisma.PointTransactionsCreateInput = {
       PointTransactionID: id,
       CreatedAt: pointHistory.addedAt.toDate(),
@@ -20,9 +28,9 @@ class PointTransactionUpdater extends Updater<PointHistory> {
           UserID: pointHistory.userUid,
         }
       },
-      PointChanged: pointHistory.amount.paid,
+      PointChanged: pointChanged,
       CanceledAmount: 0,
-      RemainingPoint: pointHistory.pointRemaining,
+      RemainingPoint: pointHistory.pointRemaining || -1,
     };
 
     await prisma.pointTransactions.upsert({
