@@ -3,7 +3,7 @@ import { Updater } from './base';
 import { prisma } from '../prisma';
 import { Prisma } from '@prisma/client';
 
-class CardTransactionsUpdater extends Updater<CardHistory2> {
+class CardTransactionUpdater extends Updater<CardHistory2> {
   constructor() {
     super();
   }
@@ -43,4 +43,4 @@ class CardTransactionsUpdater extends Updater<CardHistory2> {
     await this.createOrUpdateWhenExist(user);
   }
 }
-export const cardTransactionsUpdater = new CardTransactionsUpdater();
+export const cardTransactionUpdater = new CardTransactionUpdater();

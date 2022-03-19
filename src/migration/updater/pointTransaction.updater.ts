@@ -3,7 +3,7 @@ import { Updater } from './base';
 import { prisma } from '../prisma';
 import { Prisma } from '@prisma/client';
 
-class UserUpdater extends Updater<PointHistory> {
+class PointTransactionUpdater extends Updater<PointHistory> {
   constructor() {
     super();
   }
@@ -39,4 +39,4 @@ class UserUpdater extends Updater<PointHistory> {
     await this.createOrUpdateWhenExist(user);
   }
 }
-export const userUpdater = new UserUpdater();
+export const pointTransactionUpdater = new PointTransactionUpdater();
