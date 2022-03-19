@@ -46,10 +46,11 @@ class FileUpdater extends Updater<File> {
     if(f.status === 'COMPLETED') {
       const convertedFileRelation: Prisma.FilesConvertedCreateInput = {
         FileConvertedID: f.uid,
-        CreatedAt: f.convertedAt.toDate(),
+        CreatedAt: f.covertedAt.toDate(),
         Orientation: f.info.orientation,
         NumPages: f.info.pages,
         ThumbnailsGSPath: f.imgsPath,
+        ConvertedFileGSPath: f.convertedFilePath,
         Users: {
           connect: {
             UserID: userUid,

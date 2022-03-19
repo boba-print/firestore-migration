@@ -65,14 +65,15 @@ model Files {
 }
 
 model FilesConverted {
-  FileConvertedID  String   @id @db.VarChar(40)
-  CreatedAt        DateTime @db.DateTime(0)
-  Orientation      String   @db.VarChar(45)
-  NumPages         Int
-  ThumbnailsGSPath String   @db.VarChar(300)
-  UserID           String   @db.VarChar(45)
-  Users            Users    @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "FK_FilesConverted_Users")
-  Files            Files[]
+  FileConvertedID     String   @id @db.VarChar(40)
+  CreatedAt           DateTime @db.DateTime(0)
+  Orientation         String   @db.VarChar(45)
+  NumPages            Int
+  ThumbnailsGSPath    String   @db.VarChar(300)
+  ConvertedFileGSPath String   @db.VarChar(300)
+  UserID              String   @db.VarChar(45)
+  Users               Users    @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "FK_FilesConverted_Users")
+  Files               Files[]
 
   @@index([UserID], map: "FK_FilesConverted_Users_idx")
 }
