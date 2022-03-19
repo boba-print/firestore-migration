@@ -1,8 +1,8 @@
-import { Card } from '../../interface/database';
-import { Updater } from './base';
-import { prisma } from '../prisma';
-import { Prisma } from '@prisma/client';
-import admin from 'firebase-admin';
+import { Card } from "../../interface/database";
+import { Updater } from "./base";
+import { prisma } from "../prisma";
+import { Prisma } from "@prisma/client";
+import admin from "firebase-admin";
 
 class CardUpdater extends Updater<Card> {
   constructor() {
@@ -10,8 +10,8 @@ class CardUpdater extends Updater<Card> {
   }
 
   async fetch(uid: string, collection: string, ...args) {
-    if (typeof args[0] !== 'string') {
-      throw new Error('args[0] must be string');
+    if (typeof args[0] !== "string") {
+      throw new Error("args[0] must be string");
     }
     const userUid = args[0];
 
@@ -31,7 +31,7 @@ class CardUpdater extends Updater<Card> {
   async fetchBillingKey(uid: string) {
     const querySnap = await admin
       .firestore()
-      .collection('cardCredentials/billingKeys/list')
+      .collection("cardCredentials/billingKeys/list")
       .doc(uid)
       .get();
     if (!querySnap.exists) {
@@ -43,8 +43,8 @@ class CardUpdater extends Updater<Card> {
   }
 
   async createOrUpdateWhenExist(card: Card, ...args): Promise<any> {
-    if (typeof args[0] !== 'string') {
-      throw new Error('args[0] must be string');
+    if (typeof args[0] !== "string") {
+      throw new Error("args[0] must be string");
     }
     const userUid = args[0];
     const billingKey = await this.fetchBillingKey(card.uid);
@@ -66,7 +66,7 @@ class CardUpdater extends Updater<Card> {
         connect: {
           UserID: userUid,
         },
-      }
+      },
     };
 
     await prisma.cards.upsert({
@@ -78,9 +78,13 @@ class CardUpdater extends Updater<Card> {
     });
   }
 
-  async update(uid: string): Promise<any> {
-    const card = await this.fetch(uid, 'cards');
-    await this.createOrUpdateWhenExist(card);
+  async update(uid: string, ...args): Promise<any> {
+    if (typeof args[0] !== "string") {
+      throw new Error("args[0] must be string");
+    }
+    const userUid = args[0];
+    const card = await this.fetch(uid, 'cards', userUid);
+    await this.createOrUpdateWhenExist(card, userUid);
   }
 }
 export const cardUpdater = new CardUpdater();

@@ -16,5 +16,5 @@ export abstract class Updater<T> {
     return querySnap.docs[0].data() as T;
   }
   abstract createOrUpdateWhenExist(T, ...args): Promise<any>;
-  abstract update(uid: string): Promise<any>;
+  abstract update(uid: string, ...args): Promise<any>;
 }

@@ -17,7 +17,7 @@ class CardTransactionUpdater extends Updater<CardHistory2> {
       CanceledAmount: cardHistory.amount.refunded,
       Cards: {
         connect: {
-          CardID: cardHistory.paid.cardUid,
+          CardID: cardHistory.paid.cardUid.substring(0, 40),
         }
       },
       IamportUID: cardHistory.paid.response.imp_uid, // string

@@ -21,7 +21,7 @@ export interface Kiosk {
   status: string;
   notice: string;
   workHour: string;
-  paperTraySize: number;
+  paperTrayCap: number;
   remainPaper: number;
   connectedAt: Timestamp;
 }

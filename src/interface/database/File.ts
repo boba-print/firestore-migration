@@ -4,7 +4,7 @@ import { Common } from '..';
 import { Timestamp } from '../common/Timestamp'; 
 
 export interface File {
-  convertedAt?: Timestamp;
+  covertedAt?: Timestamp;
   convertedFilePath?: string;
   errorType: string | null;
   imgsPath?: string;

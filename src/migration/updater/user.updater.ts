@@ -16,7 +16,6 @@ class UserUpdater extends Updater<User> {
       ModifiedAt: now,
       IsDeleted: 0,
       Email: user.email,
-      CheckedNoticeAt: user.history.checkedNoticeAt.toDate(),
       LastVisitedAt: null,
       IsDisabled: user.isDisabled ? 1 : 0,
       Name: user.name,
