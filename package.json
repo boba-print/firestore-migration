@@ -1,9 +1,11 @@
 {
   "name": "firestore-migration",
   "version": "1.0.0",
-  "description": "> 미운정 잔득 든 Firestore 를 벗어나며",
+  "description": "미운정 잔득 든 Firestore 를 벗어나며",
   "main": "build/index.js",
   "scripts": {
+    "postinstall": "npx prisma generate",
+    "prisma": "prisma db pull && prisma generate",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
