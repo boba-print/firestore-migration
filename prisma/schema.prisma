@@ -1,0 +1,200 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("PRISMA_DATABASE_URL")
+}
+
+model CardTransactions {
+  CardTransactionID String              @id @db.VarChar(45)
+  CreatedAt         DateTime            @db.DateTime(0)
+  Amount            Int
+  CanceledAmount    Int
+  RejectedReason    String?             @db.VarChar(100)
+  CardID            String?             @db.VarChar(45)
+  IamportUID        String              @db.VarChar(45)
+  ReceiptURL        String              @db.VarChar(300)
+  UserID            String              @db.VarChar(45)
+  Cards             Cards?              @relation(fields: [CardID], references: [CardID], onDelete: NoAction, onUpdate: NoAction, map: "FK_CardTransactions_Cards")
+  Users             Users               @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "FK_CardTransactions_Users")
+  PointTransactions PointTransactions[]
+  PrintOrders       PrintOrders[]
+
+  @@index([CardID], map: "FK_CardTransactions_Cards_idx")
+  @@index([UserID], map: "FK_CardTransactions_Users_idx")
+}
+
+model Cards {
+  CardID           String             @id @db.VarChar(40)
+  CreatedAt        DateTime           @db.DateTime(0)
+  ModifiedAt       DateTime           @db.DateTime(0)
+  IsDeleted        Int
+  CheckSum         String             @db.VarChar(45)
+  RejectionMessage String?            @db.VarChar(45)
+  MaskedNumber     String             @db.VarChar(45)
+  Priority         Int
+  VendorCode       String             @db.VarChar(45)
+  BillingKey       String             @db.VarChar(45)
+  UserID           String             @db.VarChar(45)
+  Users            Users              @relation(fields: [UserID], references: [UserID], onUpdate: Restrict, map: "FK_Cards_Users")
+  CardTransactions CardTransactions[]
+
+  @@index([UserID], map: "FK_Cards_Users_idx")
+}
+
+model Files {
+  FileID          String          @id @db.VarChar(40)
+  CreatedAt       DateTime        @db.DateTime(0)
+  ModifiedAt      DateTime        @db.DateTime(0)
+  IsDeleted       Int
+  OriginalGSPath  String          @db.VarChar(300)
+  OriginalName    String          @db.VarChar(45)
+  ViewName        String          @db.VarChar(45)
+  Size            Int
+  UserID          String          @db.VarChar(45)
+  ConvertedFileID String?         @db.VarChar(45)
+  ErrorType       String?         @db.VarChar(45)
+  FilesConverted  FilesConverted? @relation(fields: [ConvertedFileID], references: [FileConvertedID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Files_FilesConverted")
+  Users           Users           @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Files_Users")
+  PrintJobs       PrintJobs[]
+
+  @@index([ConvertedFileID], map: "FK_Files_ConvertedFiles_idx")
+  @@index([UserID], map: "FK_Files_Users_idx")
+}
+
+model FilesConverted {
+  FileConvertedID  String   @id @db.VarChar(40)
+  CreatedAt        DateTime @db.DateTime(0)
+  Orientation      String   @db.VarChar(45)
+  NumPages         Int
+  ThumbnailsGSPath String   @db.VarChar(300)
+  UserID           String   @db.VarChar(45)
+  Users            Users    @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "FK_FilesConverted_Users")
+  Files            Files[]
+
+  @@index([UserID], map: "FK_FilesConverted_Users_idx")
+}
+
+model Kiosks {
+  KioskID           String        @id @db.VarChar(45)
+  CreatedAt         DateTime      @db.DateTime(0)
+  ModifiedAt        DateTime      @db.DateTime(0)
+  IsDeleted         Int
+  Address           String        @db.VarChar(45)
+  BuildingCode      String        @db.VarChar(45)
+  LastConnectedAt   DateTime?     @db.DateTime(0)
+  Description       String        @db.VarChar(200)
+  Group             String        @db.VarChar(100)
+  ImageUrl          String?       @db.VarChar(300)
+  IsMonoPrintable   Int
+  IsColorPrintable  Int
+  IsDuplexPrintable Int
+  ManagerID         String?       @db.VarChar(45)
+  RoughMapImageUrl  String?       @db.VarChar(45)
+  Name              String        @db.VarChar(45)
+  PricePerPage      Int           @db.UnsignedInt
+  Status            String        @db.VarChar(45)
+  Notice            String?       @db.VarChar(100)
+  WorkHour          String        @db.VarChar(45)
+  PaperTrayCapacity Int           @db.UnsignedInt
+  NumRemainPaper    Int           @db.UnsignedInt
+  CurrentViewPage   String?       @db.VarChar(45)
+  Version           String?       @db.VarChar(45)
+  PrintJobs         PrintJobs[]
+  PrintOrders       PrintOrders[]
+}
+
+model PointTransactions {
+  PointTransactionID String            @id @db.VarChar(40)
+  CreatedAt          DateTime          @db.DateTime(0)
+  CardTransactionID  String?           @db.VarChar(45)
+  Context            String            @db.VarChar(45)
+  UserID             String            @db.VarChar(45)
+  PointChanged       Int
+  CanceledAmount     Int
+  RemainingPoint     Int
+  CardTransactions   CardTransactions? @relation(fields: [CardTransactionID], references: [CardTransactionID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PointTransactions_CardTransactions")
+  Users              Users             @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PointTransactions_Users")
+  PrintOrders        PrintOrders[]
+
+  @@index([CardTransactionID], map: "FK_PointTransactions_CardTransactions_idx")
+  @@index([UserID], map: "FK_PointTransactions_Users_idx")
+}
+
+model PrintJobs {
+  PrintJobID          String                @id @db.VarChar(40)
+  CreatedAt           DateTime              @db.DateTime(0)
+  ModifiedAt          DateTime              @db.DateTime(0)
+  IsDeleted           Int
+  KioskID             String                @db.VarChar(45)
+  UserID              String                @db.VarChar(45)
+  FileID              String                @db.VarChar(45)
+  VerificationNumber  String                @db.VarChar(45)
+  Ticket              String                @db.VarChar(200)
+  Files               Files                 @relation(fields: [FileID], references: [FileID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintJobs_Files")
+  Kiosks              Kiosks                @relation(fields: [KioskID], references: [KioskID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintJobs_Kiosks")
+  Users               Users                 @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintJobs_Users")
+  PrintOrder_PrintJob PrintOrder_PrintJob[]
+
+  @@index([FileID], map: "FK_PrintJobs_Files_idx")
+  @@index([KioskID], map: "FK_PrintJobs_Kiosks_idx")
+  @@index([UserID], map: "FK_PrintJobs_Users_idx")
+}
+
+model PrintOrder_PrintJob {
+  PrintOrderID String      @db.VarChar(45)
+  PrintJobID   String      @db.VarChar(45)
+  PrintJobs    PrintJobs   @relation(fields: [PrintJobID], references: [PrintJobID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintOrders_PrintJobs")
+  PrintOrders  PrintOrders @relation(fields: [PrintOrderID], references: [PrintOrderID], onDelete: NoAction, onUpdate: NoAction, map: "FJ_PrintJobs_PrintOrders")
+
+  @@unique([PrintOrderID, PrintJobID], map: "UQ_idx")
+  @@index([PrintOrderID], map: "FJ_PrintJobs_PrintOrders_idx")
+  @@index([PrintJobID], map: "FK_PrintOrders_PrintJobs_idx")
+}
+
+model PrintOrders {
+  PrintOrderID        String                @id @db.VarChar(40)
+  CreatedAt           DateTime              @db.DateTime(0)
+  ModifiedAt          DateTime              @db.DateTime(0)
+  IsDeleted           Int
+  PointTransactionID  String?               @db.VarChar(45)
+  CardTransactionID   String?               @db.VarChar(45)
+  KioskID             String                @db.VarChar(45)
+  Status              String                @db.VarChar(45)
+  UserID              String                @db.VarChar(45)
+  CardTransactions    CardTransactions?     @relation(fields: [CardTransactionID], references: [CardTransactionID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintOrders_CardTransactions")
+  Kiosks              Kiosks                @relation(fields: [KioskID], references: [KioskID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintOrders_Kiosks")
+  PointTransactions   PointTransactions?    @relation(fields: [PointTransactionID], references: [PointTransactionID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintOrders_PointTransactions")
+  Users               Users                 @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintOrders_Users")
+  PrintOrder_PrintJob PrintOrder_PrintJob[]
+
+  @@index([CardTransactionID], map: "FK_PrintOrders_CardTransactions_idx")
+  @@index([KioskID], map: "FK_PrintOrders_Kiosks_idx")
+  @@index([PointTransactionID], map: "FK_PrintOrders_PointTransactions_idx")
+  @@index([UserID], map: "FK_PrintOrders_Users_idx")
+}
+
+model Users {
+  UserID            String              @id @db.VarChar(40)
+  CreatedAt         DateTime            @db.DateTime(0)
+  ModifiedAt        DateTime            @db.DateTime(0)
+  IsDeleted         Int
+  Email             String              @db.VarChar(100)
+  CheckedNoticeAt   DateTime?           @db.DateTime(0)
+  LastVisitedAt     DateTime?           @db.DateTime(0)
+  IsDisabled        Int
+  Name              String              @db.VarChar(45)
+  PhoneNumber       String              @db.VarChar(45)
+  Points            Int
+  StorageAllocated  BigInt              @db.UnsignedBigInt
+  StorageUsed       BigInt              @db.UnsignedBigInt
+  CardTransactions  CardTransactions[]
+  Cards             Cards[]
+  Files             Files[]
+  FilesConverted    FilesConverted[]
+  PointTransactions PointTransactions[]
+  PrintJobs         PrintJobs[]
+  PrintOrders       PrintOrders[]
+}

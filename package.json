@@ -1,0 +1,32 @@
+{
+  "name": "firestore-migration",
+  "version": "1.0.0",
+  "description": "> 미운정 잔득 든 Firestore 를 벗어나며",
+  "main": "build/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/boba-print/firestore-migration.git"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/boba-print/firestore-migration/issues"
+  },
+  "homepage": "https://github.com/boba-print/firestore-migration#readme",
+  "dependencies": {
+    "@prisma/client": "^3.11.0",
+    "axios": "^0.26.1",
+    "dotenv": "^16.0.0",
+    "firebase": "^9.6.9",
+    "firebase-admin": "^9.12.0",
+    "firebase-functions": "^3.19.0",
+    "source-map-support": "^0.5.21",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "prisma": "^3.11.0"
+  }
+}
