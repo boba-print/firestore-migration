@@ -27,6 +27,8 @@ class FileUpdater extends Updater<File> {
       UserID: ${userUid}`);
     }
 
+    console.log(f);
+
     const relation: Prisma.FilesCreateInput = {
       FileID: f.uid,
       CreatedAt: f.uploadedAt.toDate(),
@@ -57,6 +59,8 @@ class FileUpdater extends Updater<File> {
           }
         }
       };
+
+      console.log(convertedFileRelation);
       await prisma.filesConverted.upsert({
         create: convertedFileRelation,
         update: convertedFileRelation,

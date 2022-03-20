@@ -13,7 +13,7 @@ model CardTransactions {
   Amount            Int
   CanceledAmount    Int
   RejectedReason    String?             @db.VarChar(100)
-  CardID            String?             @db.VarChar(45)
+  CardID            String?             @db.VarChar(64)
   IamportUID        String              @db.VarChar(45)
   ReceiptURL        String              @db.VarChar(300)
   UserID            String              @db.VarChar(45)
@@ -27,7 +27,7 @@ model CardTransactions {
 }
 
 model Cards {
-  CardID           String             @id @db.VarChar(40)
+  CardID           String             @id @db.VarChar(64)
   CreatedAt        DateTime           @db.DateTime(0)
   ModifiedAt       DateTime           @db.DateTime(0)
   IsDeleted        Int
@@ -45,7 +45,7 @@ model Cards {
 }
 
 model Files {
-  FileID          String          @id @db.VarChar(40)
+  FileID          String          @id @db.VarChar(64)
   CreatedAt       DateTime        @db.DateTime(0)
   ModifiedAt      DateTime        @db.DateTime(0)
   IsDeleted       Int
@@ -54,18 +54,18 @@ model Files {
   ViewName        String          @db.VarChar(45)
   Size            Int
   UserID          String          @db.VarChar(45)
-  ConvertedFileID String?         @db.VarChar(45)
+  FileConvertedID String?         @db.VarChar(64)
   ErrorType       String?         @db.VarChar(45)
-  FilesConverted  FilesConverted? @relation(fields: [ConvertedFileID], references: [FileConvertedID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Files_FilesConverted")
+  FilesConverted  FilesConverted? @relation(fields: [FileConvertedID], references: [FileConvertedID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Files_FilesConverted")
   Users           Users           @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Files_Users")
   PrintJobs       PrintJobs[]
 
-  @@index([ConvertedFileID], map: "FK_Files_ConvertedFiles_idx")
+  @@index([FileConvertedID], map: "FK_Files_FilesConverted_idx")
   @@index([UserID], map: "FK_Files_Users_idx")
 }
 
 model FilesConverted {
-  FileConvertedID     String   @id @db.VarChar(40)
+  FileConvertedID     String   @id @db.VarChar(64)
   CreatedAt           DateTime @db.DateTime(0)
   Orientation         String   @db.VarChar(45)
   NumPages            Int
@@ -108,7 +108,7 @@ model Kiosks {
 }
 
 model PointTransactions {
-  PointTransactionID String            @id @db.VarChar(40)
+  PointTransactionID String            @id @db.VarChar(64)
   CreatedAt          DateTime          @db.DateTime(0)
   CardTransactionID  String?           @db.VarChar(45)
   Context            String            @db.VarChar(45)
@@ -131,7 +131,7 @@ model PrintJobs {
   IsDeleted           Int
   KioskID             String                @db.VarChar(45)
   UserID              String                @db.VarChar(45)
-  FileID              String                @db.VarChar(45)
+  FileID              String                @db.VarChar(64)
   VerificationNumber  String                @db.VarChar(45)
   Ticket              String                @db.VarChar(200)
   Files               Files                 @relation(fields: [FileID], references: [FileID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintJobs_Files")
@@ -145,22 +145,22 @@ model PrintJobs {
 }
 
 model PrintOrder_PrintJob {
-  PrintOrderID String      @db.VarChar(45)
+  PrintOrderID String      @db.VarChar(64)
   PrintJobID   String      @db.VarChar(45)
   PrintJobs    PrintJobs   @relation(fields: [PrintJobID], references: [PrintJobID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintOrders_PrintJobs")
-  PrintOrders  PrintOrders @relation(fields: [PrintOrderID], references: [PrintOrderID], onDelete: NoAction, onUpdate: NoAction, map: "FJ_PrintJobs_PrintOrders")
+  PrintOrders  PrintOrders @relation(fields: [PrintOrderID], references: [PrintOrderID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintJobs_PrintOrders")
 
-  @@unique([PrintOrderID, PrintJobID], map: "UQ_idx")
-  @@index([PrintOrderID], map: "FJ_PrintJobs_PrintOrders_idx")
+  @@unique([PrintOrderID, PrintJobID], map: "CompositeKey")
+  @@index([PrintOrderID], map: "FK_PrintJobs_PrintOrders_idx")
   @@index([PrintJobID], map: "FK_PrintOrders_PrintJobs_idx")
 }
 
 model PrintOrders {
-  PrintOrderID        String                @id @db.VarChar(40)
+  PrintOrderID        String                @id @db.VarChar(64)
   CreatedAt           DateTime              @db.DateTime(0)
   ModifiedAt          DateTime              @db.DateTime(0)
   IsDeleted           Int
-  PointTransactionID  String?               @db.VarChar(45)
+  PointTransactionID  String?               @db.VarChar(64)
   CardTransactionID   String?               @db.VarChar(45)
   KioskID             String                @db.VarChar(45)
   Status              String                @db.VarChar(45)

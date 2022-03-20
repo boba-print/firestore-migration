@@ -109,5 +109,6 @@ dist
 # build
 build/
 
-# key
+# secrets
 key/
+env/

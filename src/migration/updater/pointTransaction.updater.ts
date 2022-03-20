@@ -10,7 +10,7 @@ class PointTransactionUpdater extends Updater<PointHistory> {
 
   async createOrUpdateWhenExist(pointHistory: PointHistory): Promise<any> {
     const now = new Date();
-    const id = pointHistory.uid.substring(0, 40);
+    const id = pointHistory.uid;
     let pointChanged: number;
     const { loaded, paid, used } = pointHistory.amount;
     if (loaded !== 0) {

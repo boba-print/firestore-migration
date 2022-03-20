@@ -48,7 +48,7 @@ class CardUpdater extends Updater<Card> {
     }
     const userUid = args[0];
     const billingKey = await this.fetchBillingKey(card.uid);
-    const id = card.uid.substring(0, 40);
+    const id = card.uid;
 
     const now = new Date();
     const relation: Prisma.CardsCreateInput = {
