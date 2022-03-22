@@ -1,5 +1,6 @@
 import admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
+import { logger } from '../../logger';
 import { printHistory2MigrationService } from '../../migration/service/printHistory2.service';
 
 export async function printHistory2MigrationController(
@@ -9,7 +10,12 @@ export async function printHistory2MigrationController(
   const printHisory = snap.data();
   const uid = printHisory.uid;
 
-  console.log(JSON.stringify(snap));
+  logger.debug('Created new print history', JSON.stringify(snap));
 
-  await printHistory2MigrationService(uid);
+  try {
+    await printHistory2MigrationService(uid);
+  }
+  catch (err) {
+    logger.error(err);
+  }
 }
