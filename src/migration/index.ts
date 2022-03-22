@@ -14,7 +14,7 @@ const printHistory2 = firestoreFunctionsBuilder
   .document(PRINT_HISTORY2_PATH)
   .onCreate(printHistory2MigrationController);
 
-const KIOSK_PATH = "kiosk/{uid}";
+const KIOSK_PATH = "kiosks/{uid}";
 const kioskOnWrite = firestoreFunctionsBuilder
   .document(KIOSK_PATH)
   .onWrite(kioskMigrationController);
