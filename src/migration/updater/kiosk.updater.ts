@@ -44,8 +44,7 @@ class KioskUpdater extends Updater<Kiosk> {
     });
   }
 
-  async setDeletedOrIgnoreWhenNotExist(kiosk: Kiosk): Promise<any> {
-    const { uid } = kiosk;
+  async setDeletedOrIgnoreWhenNotExist(uid: string): Promise<any> {
     const kioskRelation = await prisma.kiosks.findUnique({
       where: {
         KioskID: uid,
@@ -69,7 +68,7 @@ class KioskUpdater extends Updater<Kiosk> {
       await this.createOrUpdateWhenExist(document);
     }
     else {
-      await this.setDeletedOrIgnoreWhenNotExist(document);
+      await this.setDeletedOrIgnoreWhenNotExist(uid);
     }
   }
 }

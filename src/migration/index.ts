@@ -9,8 +9,9 @@ const firestoreFunctionsBuilder = functions
   })
   .region("asia-northeast1").firestore;
 
+const PRINT_HISTORY2_PATH = "printHistory2/{uid}";
 const printHistory2 = firestoreFunctionsBuilder
-  .document("printHistory2/{uid}")
+  .document(PRINT_HISTORY2_PATH)
   .onCreate(printHistory2MigrationController);
 
 const KIOSK_PATH = "kiosk/{uid}";

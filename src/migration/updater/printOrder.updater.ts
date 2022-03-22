@@ -49,8 +49,7 @@ class PrintOrderUpdater extends Updater<PrintHistory2> {
     });
   }
 
-  async setDeletedOrIgnoreWhenNotExist(printHistory: PrintHistory2): Promise<any> {
-    const uid = printHistory.uid;
+  async setDeletedOrIgnoreWhenNotExist(uid: string): Promise<any> {
     const printHistoryRelation = await prisma.printOrders.findUnique({
       where: {
         PrintOrderID: uid,
@@ -74,7 +73,7 @@ class PrintOrderUpdater extends Updater<PrintHistory2> {
       await this.createOrUpdateWhenExist(document);
     }
     else {
-      await this.setDeletedOrIgnoreWhenNotExist(document);
+      await this.setDeletedOrIgnoreWhenNotExist(uid);
     }
   }
 }

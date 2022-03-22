@@ -82,8 +82,7 @@ class FileUpdater extends Updater<File> {
     });
   }
 
-  async setDeletedOrIgnoreWhenNotExist(file: File): Promise<any> {
-    const { uid } = file;
+  async setDeletedOrIgnoreWhenNotExist(uid: string): Promise<any> {
     const fileRelation = await prisma.files.findUnique({
       where: {
         FileID: uid,
@@ -94,7 +93,7 @@ class FileUpdater extends Updater<File> {
       fileRelation.IsDeleted = 1;
       await prisma.files.update({
         where: {
-          FileID: file.uid,
+          FileID: uid,
         },
         data : fileRelation,
       })
@@ -107,7 +106,7 @@ class FileUpdater extends Updater<File> {
       await this.createOrUpdateWhenExist(document);
     }
     else {
-      await this.setDeletedOrIgnoreWhenNotExist(document);
+      await this.setDeletedOrIgnoreWhenNotExist(uid);
     }
   }
 }

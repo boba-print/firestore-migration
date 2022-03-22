@@ -1,6 +1,6 @@
 {
   "name": "firestore-migration",
-  "version": "1.1.0-beta1",
+  "version": "1.1.0",
   "description": "미운정 잔득 든 Firestore 를 벗어나며",
   "main": "build/index.js",
   "scripts": {

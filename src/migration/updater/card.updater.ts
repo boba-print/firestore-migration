@@ -80,10 +80,10 @@ class CardUpdater extends Updater<Card> {
     });
   }
 
-  async setDeletedOrIgnoreWhenNotExist(card: Card) {
+  async setDeletedOrIgnoreWhenNotExist(uid: string) {
     const cardRelation = await prisma.cards.findUnique({
       where: {
-        CardID: card.uid,
+        CardID: uid,
       },
     });
 
@@ -91,7 +91,7 @@ class CardUpdater extends Updater<Card> {
       cardRelation.IsDeleted = 1;
       await prisma.cards.update({
         where: {
-          CardID: card.uid,
+          CardID: uid,
         },
         data: cardRelation,
       });
@@ -108,7 +108,7 @@ class CardUpdater extends Updater<Card> {
       await this.createOrUpdateWhenExist(card, userUid);
     }
     else {
-      await this.setDeletedOrIgnoreWhenNotExist(card);
+      await this.setDeletedOrIgnoreWhenNotExist(uid);
     }
   }
 }

@@ -35,10 +35,10 @@ class UserUpdater extends Updater<User> {
     });
   }
 
-  async setDeletedOrIgnoreWhenNotExist(user: User): Promise<any> {
+  async setDeletedOrIgnoreWhenNotExist(uid: string): Promise<any> {
     const userReleation = await prisma.users.findUnique({
       where: {
-        UserID: user.uid,
+        UserID: uid,
       }
     });
 
@@ -47,7 +47,7 @@ class UserUpdater extends Updater<User> {
       await prisma.users.update(
         {
           where: {
-            UserID: user.uid
+            UserID: uid
           },
           data: userReleation,
         }
@@ -61,7 +61,7 @@ class UserUpdater extends Updater<User> {
       await this.createOrUpdateWhenExist(user);
     }
     else {
-      await this.setDeletedOrIgnoreWhenNotExist(user);
+      await this.setDeletedOrIgnoreWhenNotExist(uid);
     }
   }
 }

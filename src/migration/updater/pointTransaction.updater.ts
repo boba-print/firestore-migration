@@ -43,7 +43,7 @@ class PointTransactionUpdater extends Updater<PointHistory> {
     });
   }
 
-  async setDeletedOrIgnoreWhenNotExist(pointHistory: PointHistory): Promise<any> {
+  async setDeletedOrIgnoreWhenNotExist(uid: string): Promise<any> {
     logger.error('pointHistory is deleted. Which should not be deleted');
   }
 
@@ -54,7 +54,7 @@ class PointTransactionUpdater extends Updater<PointHistory> {
       await this.createOrUpdateWhenExist(pointHistory);
     }
     else {
-      await this.setDeletedOrIgnoreWhenNotExist(pointHistory);
+      await this.setDeletedOrIgnoreWhenNotExist(uid);
     }
   }
 }

@@ -1,4 +1,3 @@
-import path from 'path';
 import 'dotenv/config';
 import * as admin from 'firebase-admin';
 class InitializationError extends Error {
