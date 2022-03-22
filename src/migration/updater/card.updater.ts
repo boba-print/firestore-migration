@@ -21,9 +21,11 @@ class CardUpdater extends Updater<Card> {
       .doc(uid)
       .get();
     if (!querySnap.exists) {
-      throw new Error(`Not Found:
-      collection: ${collection},
-      uid: ${uid}`);
+      console.log("Not Found", {
+        collection,
+        uid,
+      });
+      return null;
     }
     return querySnap.data() as Card;
   }
@@ -78,13 +80,36 @@ class CardUpdater extends Updater<Card> {
     });
   }
 
+  async setDeletedOrIgnoreWhenNotExist(card: Card) {
+    const cardRelation = await prisma.cards.findUnique({
+      where: {
+        CardID: card.uid,
+      },
+    });
+
+    if (cardRelation) {
+      cardRelation.IsDeleted = 1;
+      await prisma.cards.update({
+        where: {
+          CardID: card.uid,
+        },
+        data: cardRelation,
+      });
+    }
+  }
+
   async update(uid: string, ...args): Promise<any> {
     if (typeof args[0] !== "string") {
       throw new Error("args[0] must be string");
     }
     const userUid = args[0];
-    const card = await this.fetch(uid, 'cards', userUid);
-    await this.createOrUpdateWhenExist(card, userUid);
+    const card = await this.fetch(uid, "cards", userUid);
+    if(card) {
+      await this.createOrUpdateWhenExist(card, userUid);
+    }
+    else {
+      await this.setDeletedOrIgnoreWhenNotExist(card);
+    }
   }
 }
 export const cardUpdater = new CardUpdater();

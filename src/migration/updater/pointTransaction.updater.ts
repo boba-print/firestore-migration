@@ -2,6 +2,7 @@ import { PointHistory } from '../../interface/database';
 import { Updater } from './base';
 import { prisma } from '../prisma';
 import { Prisma } from '@prisma/client';
+import { logger } from 'firebase-functions/v1';
 
 class PointTransactionUpdater extends Updater<PointHistory> {
   constructor() {
@@ -42,9 +43,19 @@ class PointTransactionUpdater extends Updater<PointHistory> {
     });
   }
 
+  async setDeletedOrIgnoreWhenNotExist(pointHistory: PointHistory): Promise<any> {
+    logger.error('pointHistory is deleted. Which should not be deleted');
+  }
+
   async update(uid: string): Promise<any> {
-    const user = await this.fetch(uid, 'pointHistory');
-    await this.createOrUpdateWhenExist(user);
+    const pointHistory = await this.fetch(uid, 'pointHistory');
+
+    if(pointHistory) {
+      await this.createOrUpdateWhenExist(pointHistory);
+    }
+    else {
+      await this.setDeletedOrIgnoreWhenNotExist(pointHistory);
+    }
   }
 }
 export const pointTransactionUpdater = new PointTransactionUpdater();

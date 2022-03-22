@@ -44,9 +44,33 @@ class KioskUpdater extends Updater<Kiosk> {
     });
   }
 
+  async setDeletedOrIgnoreWhenNotExist(kiosk: Kiosk): Promise<any> {
+    const { uid } = kiosk;
+    const kioskRelation = await prisma.kiosks.findUnique({
+      where: {
+        KioskID: uid,
+      }
+    });
+
+    if(kioskRelation) {
+      kioskRelation.IsDeleted = 1;
+      await prisma.kiosks.update({
+        where: {
+          KioskID: uid,
+        },
+        data: kioskRelation
+      });
+    }
+  }
+
   async update(uid: string): Promise<any> {
     const document = await this.fetch(uid, 'kiosks');
-    await this.createOrUpdateWhenExist(document);
+    if(document) {
+      await this.createOrUpdateWhenExist(document);
+    }
+    else {
+      await this.setDeletedOrIgnoreWhenNotExist(document);
+    }
   }
 }
 export const kioskUpdater = new KioskUpdater();

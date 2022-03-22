@@ -1,9 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "../prisma";
-import admin, { firestore } from "firebase-admin";
-import * as functions from "firebase-functions";
 import { Ticket } from "../../interface/common";
-import { PrintHistory2, PrintJob } from "../../interface/database";
 import { fileUpdater } from "../../migration/updater/file.updater";
 import { kioskUpdater } from "../../migration/updater/kiosk.updater";
 import { pointTransactionUpdater } from "../../migration/updater/pointTransaction.updater";

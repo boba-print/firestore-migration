@@ -1,20 +1,28 @@
 import { NotFoundError } from "../../error";
-import admin from 'firebase-admin';
+import admin from "firebase-admin";
+import { logger } from "firebase-functions/v1";
 
 export abstract class Updater<T> {
-  public async fetch(uid: string, collctionName: string, ...args): Promise<T> {
+  public async fetch(
+    uid: string,
+    collctionName: string,
+    ...args
+  ): Promise<T | null> {
     const querySnap = await admin
       .firestore()
       .collection(collctionName)
-      .where('uid', '==', uid)
+      .where("uid", "==", uid)
       .get();
     if (querySnap.docs.length === 0) {
-      throw new NotFoundError(`Not Found:
-      collection: ${collctionName},
-      uid: ${uid}`);
+      logger.info("Not Found", {
+        collection: collctionName,
+        uid,
+      });
+      return null;
     }
     return querySnap.docs[0].data() as T;
   }
   abstract createOrUpdateWhenExist(T, ...args): Promise<any>;
+  abstract setDeletedOrIgnoreWhenNotExist(T, ...args): Promise<any>;
   abstract update(uid: string, ...args): Promise<any>;
 }

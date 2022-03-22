@@ -49,9 +49,33 @@ class PrintOrderUpdater extends Updater<PrintHistory2> {
     });
   }
 
+  async setDeletedOrIgnoreWhenNotExist(printHistory: PrintHistory2): Promise<any> {
+    const uid = printHistory.uid;
+    const printHistoryRelation = await prisma.printOrders.findUnique({
+      where: {
+        PrintOrderID: uid,
+      }
+    });
+
+    if(printHistoryRelation) {
+      printHistoryRelation.IsDeleted = 1;
+      await prisma.printOrders.update({
+        where: {
+          PrintOrderID: uid,
+        },
+        data: printHistoryRelation
+      });
+    }
+  }
+
   async update(uid: string): Promise<any> {
     const document = await this.fetch(uid, 'printHistory2');
-    await this.createOrUpdateWhenExist(document);
+    if(document) {
+      await this.createOrUpdateWhenExist(document);
+    }
+    else {
+      await this.setDeletedOrIgnoreWhenNotExist(document);
+    }
   }
 }
 export const printOrderUpdater = new PrintOrderUpdater();

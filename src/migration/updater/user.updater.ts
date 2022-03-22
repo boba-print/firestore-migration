@@ -35,9 +35,34 @@ class UserUpdater extends Updater<User> {
     });
   }
 
+  async setDeletedOrIgnoreWhenNotExist(user: User): Promise<any> {
+    const userReleation = await prisma.users.findUnique({
+      where: {
+        UserID: user.uid,
+      }
+    });
+
+    if(userReleation) {
+      userReleation.IsDeleted = 1;
+      await prisma.users.update(
+        {
+          where: {
+            UserID: user.uid
+          },
+          data: userReleation,
+        }
+      );
+    }
+  }
+
   async update(uid: string): Promise<any> {
     const user = await this.fetch(uid, "users");
-    await this.createOrUpdateWhenExist(user);
+    if(user) {
+      await this.createOrUpdateWhenExist(user);
+    }
+    else {
+      await this.setDeletedOrIgnoreWhenNotExist(user);
+    }
   }
 }
 export const userUpdater = new UserUpdater();

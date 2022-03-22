@@ -82,9 +82,33 @@ class FileUpdater extends Updater<File> {
     });
   }
 
+  async setDeletedOrIgnoreWhenNotExist(file: File): Promise<any> {
+    const { uid } = file;
+    const fileRelation = await prisma.files.findUnique({
+      where: {
+        FileID: uid,
+      }
+    });
+
+    if(fileRelation) {
+      fileRelation.IsDeleted = 1;
+      await prisma.files.update({
+        where: {
+          FileID: file.uid,
+        },
+        data : fileRelation,
+      })
+    }
+  }
+
   async update(uid: string): Promise<any> {
     const document = await this.fetch(uid, 'files');
-    await this.createOrUpdateWhenExist(document);
+    if(document) {
+      await this.createOrUpdateWhenExist(document);
+    }
+    else {
+      await this.setDeletedOrIgnoreWhenNotExist(document);
+    }
   }
 }
 export const fileUpdater = new FileUpdater();
