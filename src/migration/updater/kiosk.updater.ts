@@ -20,6 +20,7 @@ class KioskUpdater extends Updater<Kiosk> {
       Longitude: 127.2, // dummy
       BuildingCode: kiosk.buildingCode,
       LastConnectedAt: kiosk.connectedAt.toDate(),
+      MantenacePasscode: '01234',
       Description: kiosk.description,
       Group: kiosk.group,
       ImageUrl: kiosk.imageUrl,

@@ -88,6 +88,7 @@ model Kiosks {
   Longitude         Float
   BuildingCode      String        @db.VarChar(45)
   LastConnectedAt   DateTime?     @db.DateTime(0)
+  MantenacePasscode String        @db.VarChar(10)
   Description       String        @db.VarChar(200)
   Group             String        @db.VarChar(100)
   ImageUrl          String?       @db.VarChar(300)
