@@ -16,6 +16,8 @@ class KioskUpdater extends Updater<Kiosk> {
       ModifiedAt: now,
       IsDeleted: 0,
       Address: kiosk.address,
+      Latitude: 37.1, // dummy
+      Longitude: 127.2, // dummy
       BuildingCode: kiosk.buildingCode,
       LastConnectedAt: kiosk.connectedAt.toDate(),
       Description: kiosk.description,

@@ -84,6 +84,8 @@ model Kiosks {
   ModifiedAt        DateTime      @db.DateTime(0)
   IsDeleted         Int
   Address           String        @db.VarChar(45)
+  Latitude          Float
+  Longitude         Float
   BuildingCode      String        @db.VarChar(45)
   LastConnectedAt   DateTime?     @db.DateTime(0)
   Description       String        @db.VarChar(200)
