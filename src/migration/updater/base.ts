@@ -1,4 +1,3 @@
-import { NotFoundError } from "../../error";
 import admin from "firebase-admin";
 import { logger } from "firebase-functions/v1";
 

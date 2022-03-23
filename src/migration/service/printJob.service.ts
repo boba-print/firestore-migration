@@ -4,36 +4,55 @@ import { PrintHistory2 } from "../../interface/response";
 import { logger } from "../../logger";
 
 export class PrintJobService {
-  async deleteRemainJobWhenPrintHistoryCreated(printHistory: PrintHistory2) {
-    const kioskUid = printHistory.kiosk.uid;
-    const userUid = printHistory.userUid;
-
-    const kioskJobs = await admin
+  async findJobsWithKioskUidAndUserUid(
+    kioskUid: string,
+    userUid: string
+  ): Promise<{
+    kioskJob: KioskJob | null;
+    printJobs: PrintJob[];
+  }> {
+    const kioskJobQuerySnap = await admin
       .firestore()
       .collection("kioskJobs")
       .where("kiosk.uid", "==", kioskUid)
       .where("owner.uid", "==", userUid)
       .get();
 
-    if (kioskJobs.docs.length === 0) {
+    if (kioskJobQuerySnap.docs.length === 0) {
       logger.info("Can not find kioskJob. May be already deleted.");
-      return;
+      return {
+        kioskJob: null,
+        printJobs: [],
+      };
     }
-
     // User can make only one kioskJob for one kiosk
-    const kioskJob = kioskJobs.docs[0].data() as KioskJob;
-    const printJobCollectionPath = `kioskJobs/${kioskJob.uid}/printJobs`;
+    const kioskJob = kioskJobQuerySnap.docs[0].data() as KioskJob;
 
-    const querySnap = await admin
+    const printJobCollectionPath = `kioskJobs/${kioskJob.uid}/printJobs`;
+    const printJobQuerySnap = await admin
       .firestore()
       .collection(printJobCollectionPath)
       .get();
-    const printJobs = querySnap.docs.map((d) => d.data() as PrintJob);
+    const printJobs = printJobQuerySnap.docs.map((d) => d.data() as PrintJob);
+    return {
+      kioskJob,
+      printJobs,
+    };
+  }
+
+  async deleteRemainJobWhenPrintHistoryCreated(printHistory: PrintHistory2) {
+    const kioskUid = printHistory.kiosk.uid;
+    const userUid = printHistory.userUid;
+
+    const { kioskJob, printJobs } = await this.findJobsWithKioskUidAndUserUid(
+      kioskUid,
+      userUid
+    );
 
     const whenDeleted = printJobs
       .map((pj) => pj.uid)
       .map((uid) =>
-        admin.firestore().doc(`${printJobCollectionPath}/${uid}`).delete()
+        admin.firestore().doc(`kioskJobs/${kioskJob.uid}/printJobs/${uid}`).delete()
       );
 
     // Consider the case that the printJob already deleted
@@ -43,10 +62,13 @@ export class PrintJobService {
       logger.info("Can not delete printJobs. May be already deleted.");
     }
 
+    if(!kioskJob) {
+      return;
+    }
+
     try {
       await admin.firestore().doc(`kioskJobs/${kioskJob.uid}`).delete();
-    }
-    catch (err) {
+    } catch (err) {
       logger.info("Can not delete kioskJob. May be already deleted.");
     }
   }

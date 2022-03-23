@@ -132,8 +132,16 @@ model PrintJobs {
   KioskID             String                @db.VarChar(45)
   UserID              String                @db.VarChar(45)
   FileID              String                @db.VarChar(64)
+  NumPrintPages       Int?                  @db.UnsignedInt
   VerificationNumber  String                @db.VarChar(45)
-  Ticket              String                @db.VarChar(200)
+  NumCopies           Int                   @db.UnsignedInt
+  PageFitting         String                @db.VarChar(20)
+  Duplex              String                @db.VarChar(20)
+  NUp                 Int
+  LayoutOrder         String                @db.VarChar(20)
+  PaperOrientation    String                @db.VarChar(20)
+  IsColor             Int
+  PageRanges          String                @db.VarChar(100)
   Files               Files                 @relation(fields: [FileID], references: [FileID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintJobs_Files")
   Kiosks              Kiosks                @relation(fields: [KioskID], references: [KioskID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintJobs_Kiosks")
   Users               Users                 @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintJobs_Users")

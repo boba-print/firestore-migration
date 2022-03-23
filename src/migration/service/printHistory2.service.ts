@@ -88,8 +88,16 @@ export async function printHistory2MigrationService(printHistoryUid: string) {
           FileID: fileUid,
         },
       },
+      NumPrintPages: 10,
       VerificationNumber: "00000",
-      Ticket: JSON.stringify(defaultTicket),
+      NumCopies: 1,
+      PageFitting: "FIT_TO_PAGE",
+      Duplex: "TWO_SIDE_LONG",
+      NUp: 2,
+      LayoutOrder: "RIGHT_TO_DOWN",
+      PaperOrientation: "AUTO",
+      IsColor: 1,
+      PageRanges: "1-2,3",
     };
     return printJobRelation;
   };
