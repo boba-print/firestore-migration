@@ -7,19 +7,26 @@ export async function userOnWriteController(
   change: functions.Change<functions.firestore.DocumentSnapshot>,
   context: functions.EventContext
 ) {
-  const user = change.after.data() as User;
-  const userUid = user.uid;
+  const { before, after } = change;
 
-  logger.debug(
-    "Update from... to...",
-    change.before.data(),
-    change.after.data()
-  );
+  logger.debug("Update from... to...", {
+    before: before.data(),
+    after: after.data(),
+  });
 
-  try {
-    await userStreamMigrationService(userUid);
+  let userUid: string;
+  if (before.exists) {
+    userUid = before.data().uid;
   }
-  catch (err) {
-    logger.error(err);
+  if (after.exists) {
+    userUid = after.data().uid;
+  }
+
+  if (userUid) {
+    try {
+      await userStreamMigrationService(userUid);
+    } catch (err) {
+      logger.error(err);
+    }
   }
 }
