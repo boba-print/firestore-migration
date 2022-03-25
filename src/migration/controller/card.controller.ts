@@ -12,7 +12,8 @@ export async function cardOnWriteController(
   const cardUid = card.uid;
   // users/{userUid}/cards/{cardUid}
   // card -(parent)-> cardCollection -(parent)-> user
-  const userUid = after.ref.parent.parent.id;
+  const userQuerySnap = await after.ref.parent.parent.get();
+  const user = userQuerySnap.data() as User;
 
   logger.debug(
     "Update from... to...",
@@ -23,7 +24,7 @@ export async function cardOnWriteController(
   );
 
   try {
-    await cardStreamMigrationService(cardUid, userUid);
+    await cardStreamMigrationService(cardUid, user.uid);
   }
   catch (err) {
     logger.error(err);

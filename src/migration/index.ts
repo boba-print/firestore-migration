@@ -1,6 +1,6 @@
 import * as functions from "firebase-functions";
 import { cardOnWriteController } from "./controller/card.controller";
-import { cardHistory2Controller } from "./controller/cardHistory2.controller";
+import { cardHistory2OnWriteController } from "./controller/cardHistory2.controller";
 import { kioskMigrationController } from "./controller/kiosk.controller";
 import { printHistory2MigrationController } from "./controller/printHistory2.controller";
 import { userOnWriteController } from "./controller/user.controller";
@@ -35,7 +35,7 @@ const cardOnWrite = firestoreFunctionsBuilder
 const CARD_TRANSACTION_PATH = "cardHistory2/{uid}";
 const cardHisotyOnWrite = firestoreFunctionsBuilder
   .document(CARD_TRANSACTION_PATH)
-  .onWrite(cardHistory2Controller);
+  .onWrite(cardHistory2OnWriteController);
 
 export default {
   printHistory2,
