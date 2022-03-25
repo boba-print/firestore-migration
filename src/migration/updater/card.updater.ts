@@ -3,6 +3,7 @@ import { Updater } from "./base";
 import { prisma } from "../prisma";
 import { Prisma } from "@prisma/client";
 import admin from "firebase-admin";
+import { logger } from "../../logger";
 
 class CardUpdater extends Updater<Card> {
   constructor() {
@@ -21,7 +22,7 @@ class CardUpdater extends Updater<Card> {
       .doc(uid)
       .get();
     if (!querySnap.exists) {
-      console.log("Not Found", {
+      logger.info("Not Found", {
         collection,
         uid,
       });

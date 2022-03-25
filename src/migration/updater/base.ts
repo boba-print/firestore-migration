@@ -13,7 +13,7 @@ export abstract class Updater<T> {
       .where("uid", "==", uid)
       .get();
     if (querySnap.docs.length === 0) {
-      logger.info("Not Found", {
+      logger.warn("Not Found", {
         collection: collctionName,
         uid,
       });

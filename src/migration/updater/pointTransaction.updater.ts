@@ -44,7 +44,7 @@ class PointTransactionUpdater extends Updater<PointHistory> {
   }
 
   async setDeletedOrIgnoreWhenNotExist(uid: string): Promise<any> {
-    logger.error('pointHistory is deleted. Which should not be deleted');
+    logger.warn("pointHistory is deleted. Which should not be deleted");
   }
 
   async update(uid: string): Promise<any> {

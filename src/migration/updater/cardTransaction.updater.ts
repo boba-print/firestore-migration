@@ -40,7 +40,7 @@ class CardTransactionUpdater extends Updater<CardHistory2> {
   }
 
   async setDeletedOrIgnoreWhenNotExist(uid: string): Promise<any> {
-    logger.error('cardHistory2 deleted, which should not be deleted', { uid });
+    logger.warn("cardHistory2 deleted, which should not be deleted", { uid });
   }
 
   async update(uid: string): Promise<any> {

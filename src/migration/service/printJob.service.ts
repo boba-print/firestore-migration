@@ -18,7 +18,7 @@ export class PrintJobService {
       .get();
 
     if (kioskJobQuerySnap.docs.length === 0) {
-      logger.info("Can not find kioskJob. May be already deleted.");
+      logger.warn("Can not find kioskJob. May be already deleted.");
       return {
         kioskJob: null,
         printJobs: [],
@@ -61,7 +61,7 @@ export class PrintJobService {
     try {
       await Promise.all(whenDeleted);
     } catch (err) {
-      logger.info("Can not delete printJobs. May be already deleted.");
+      logger.warn("Can not delete printJobs. May be already deleted.");
     }
 
     if (!kioskJob) {
@@ -71,7 +71,7 @@ export class PrintJobService {
     try {
       await admin.firestore().doc(`kioskJobs/${kioskJob.uid}`).delete();
     } catch (err) {
-      logger.info("Can not delete kioskJob. May be already deleted.");
+      logger.warn("Can not delete kioskJob. May be already deleted.");
     }
   }
 }
