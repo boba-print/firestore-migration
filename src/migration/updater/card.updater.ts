@@ -98,11 +98,10 @@ class CardUpdater extends Updater<Card> {
     }
   }
 
-  async update(uid: string, ...args): Promise<any> {
-    if (typeof args[0] !== "string") {
-      throw new Error("args[0] must be string");
+  async update(uid: string, userUid: string): Promise<any> {
+    if (typeof userUid !== "string") {
+      throw new Error("userUid must be string");
     }
-    const userUid = args[0];
     const card = await this.fetch(uid, "cards", userUid);
     if(card) {
       await this.createOrUpdateWhenExist(card, userUid);

@@ -1,6 +1,5 @@
 import admin from "firebase-admin";
-import { KioskJob, PrintJob } from "../../interface/database";
-import { PrintHistory2 } from "../../interface/response";
+import { KioskJob, PrintJob, PrintHistory2 } from "../../interface/database";
 import { logger } from "../../logger";
 
 export class PrintJobService {
@@ -52,7 +51,10 @@ export class PrintJobService {
     const whenDeleted = printJobs
       .map((pj) => pj.uid)
       .map((uid) =>
-        admin.firestore().doc(`kioskJobs/${kioskJob.uid}/printJobs/${uid}`).delete()
+        admin
+          .firestore()
+          .doc(`kioskJobs/${kioskJob.uid}/printJobs/${uid}`)
+          .delete()
       );
 
     // Consider the case that the printJob already deleted
@@ -62,7 +64,7 @@ export class PrintJobService {
       logger.info("Can not delete printJobs. May be already deleted.");
     }
 
-    if(!kioskJob) {
+    if (!kioskJob) {
       return;
     }
 

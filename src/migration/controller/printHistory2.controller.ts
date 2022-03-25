@@ -1,7 +1,6 @@
 import admin from "firebase-admin";
 import * as functions from "firebase-functions";
-import { KioskJob, PrintJob } from "../../interface/database";
-import { PrintHistory2 } from "../../interface/response";
+import { PrintHistory2 } from "../../interface/database";
 import { logger } from "../../logger";
 import { printHistory2MigrationService } from "../../migration/service/printHistory2.service";
 import { printJobService } from "../service/printJob.service";
