@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import * as admin from 'firebase-admin';
+import { logger } from './logger';
 class InitializationError extends Error {
   // 앱 초기화 시 오류
   constructor(message: string) {
@@ -16,11 +17,11 @@ if (!envs.STORAGE_BUCKET) {
   throw new InitializationError('STORAGE_BUCKET not found');
 }
 
-console.log(`Initialize App with following environment variables
-GOOGLE_APPLICATION_CREDENTIALS=${envs.GOOGLE_APPLICATION_CREDENTIALS}
-DATABASE_URL=${envs.DATABASE_URL}
-STORAGE_BUCKET=${envs.STORAGE_BUCKET}
-`);
+logger.info('Initialize App with following environment variables', {
+  GOOGLE_APPLICATION_CREDENTIALS: envs.GOOGLE_APPLICATION_CREDENTIALS,
+  DATABASE_URL: envs.DATABASE_URL,
+  STORAGE_BUCKET: envs.STORAGE_BUCKET,
+});
 
 admin.initializeApp({
   credential: admin.credential.applicationDefault(),
