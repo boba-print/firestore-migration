@@ -7,16 +7,19 @@ export async function cardOnWriteController(
   change: functions.Change<functions.firestore.DocumentSnapshot>,
   context: functions.EventContext
 ) {
-  const card = change.after.data() as Card;
+  const { before, after } = change;
+  const card = after.data() as Card;
   const cardUid = card.uid;
   // users/{userUid}/cards/{cardUid}
   // card -(parent)-> cardCollection -(parent)-> user
-  const userUid = change.after.ref.parent.parent.id;
+  const userUid = after.ref.parent.parent.id;
 
   logger.debug(
     "Update from... to...",
-    change.before.data(),
-    change.after.data()
+    {
+      before: before.data(),
+      after: after.data()
+    }
   );
 
   try {

@@ -6,13 +6,16 @@ export async function kioskMigrationController(
   change: functions.Change<functions.firestore.DocumentSnapshot>,
   ctx: functions.EventContext
 ) {
+  const { before, after } = change;
   const kiosk = change.after.data();
   const uid = kiosk.uid;
 
   logger.debug(
     "Update from... to...",
-    change.before.data(),
-    change.after.data()
+    {
+      before: before.data(),
+      after: after.data()
+    }
   );
 
   try {
