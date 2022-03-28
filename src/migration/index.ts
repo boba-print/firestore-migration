@@ -4,6 +4,7 @@ import { cardHistory2Controller } from "./controller/cardHistory2.controller";
 import { fileOnWriteController } from "./controller/file.controller";
 import { kioskMigrationController } from "./controller/kiosk.controller";
 import { printHistory2MigrationController } from "./controller/printHistory2.controller";
+import { printJobOnWriteController } from "./controller/printJob.controller";
 import { userOnWriteController } from "./controller/user.controller";
 
 const firestoreFunctionsBuilder = functions
@@ -43,6 +44,11 @@ const fileOnWrite = firestoreFunctionsBuilder
   .document(FILE_PATH)
   .onWrite(fileOnWriteController);
 
+const PRINT_JOB_PATH = "kioskJobs/{kioskJobUid}/printJobs/{printJobUid}";
+const printJobOnWrite = firestoreFunctionsBuilder
+  .document(PRINT_JOB_PATH)
+  .onWrite(printJobOnWriteController);
+
 export default {
   printHistory2,
   kioskOnWrite,
@@ -50,4 +56,5 @@ export default {
   cardOnWrite,
   cardHistoryOnWrite,
   fileOnWrite,
+  printJobOnWrite,
 };
