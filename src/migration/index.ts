@@ -1,6 +1,7 @@
 import * as functions from "firebase-functions";
 import { cardOnWriteController } from "./controller/card.controller";
 import { cardHistory2Controller } from "./controller/cardHistory2.controller";
+import { fileOnWriteController } from "./controller/file.controller";
 import { kioskMigrationController } from "./controller/kiosk.controller";
 import { printHistory2MigrationController } from "./controller/printHistory2.controller";
 import { userOnWriteController } from "./controller/user.controller";
@@ -27,20 +28,26 @@ const userOnWrite = firestoreFunctionsBuilder
   .document(USER_PATH)
   .onWrite(userOnWriteController);
 
-const CARD_PATH = "users/{cardUid}/cards/{cardUid}";
+const CARD_PATH = "users/{userUid}/cards/{cardUid}";
 const cardOnWrite = firestoreFunctionsBuilder
   .document(CARD_PATH)
   .onWrite(cardOnWriteController);
 
 const CARD_TRANSACTION_PATH = "cardHistory2/{uid}";
-const cardHisotyOnWrite = firestoreFunctionsBuilder
+const cardHistoryOnWrite = firestoreFunctionsBuilder
   .document(CARD_TRANSACTION_PATH)
   .onWrite(cardHistory2Controller);
+
+const FILE_PATH = "files/{uid}";
+const fileOnWrite = firestoreFunctionsBuilder
+  .document(FILE_PATH)
+  .onWrite(fileOnWriteController);
 
 export default {
   printHistory2,
   kioskOnWrite,
   userOnWrite,
   cardOnWrite,
-  cardHisotyOnWrite,
+  cardHistoryOnWrite,
+  fileOnWrite,
 };
