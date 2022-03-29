@@ -1,11 +1,11 @@
 import * as functions from "firebase-functions";
 import { cardOnWriteController } from "./controller/card.controller";
-import { cardHistory2Controller } from "./controller/cardHistory2.controller";
-import { fileOnWriteController } from "./controller/file.controller";
+import { cardHistory2OnWriteController } from "./controller/cardHistory2.controller";
 import { kioskMigrationController } from "./controller/kiosk.controller";
 import { printHistory2MigrationController } from "./controller/printHistory2.controller";
 import { printJobOnWriteController } from "./controller/printJob.controller";
 import { userOnWriteController } from "./controller/user.controller";
+import { fileOnWriteController } from "./controller/file.controller";
 
 const firestoreFunctionsBuilder = functions
   .runWith({
@@ -37,7 +37,7 @@ const cardOnWrite = firestoreFunctionsBuilder
 const CARD_TRANSACTION_PATH = "cardHistory2/{uid}";
 const cardHistoryOnWrite = firestoreFunctionsBuilder
   .document(CARD_TRANSACTION_PATH)
-  .onWrite(cardHistory2Controller);
+  .onWrite(cardHistory2OnWriteController);
 
 const FILE_PATH = "files/{uid}";
 const fileOnWrite = firestoreFunctionsBuilder
