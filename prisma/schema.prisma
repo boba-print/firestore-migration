@@ -51,8 +51,8 @@ model Files {
   ModifiedAt      DateTime        @db.DateTime(0)
   IsDeleted       Int
   OriginalGSPath  String          @db.VarChar(300)
-  OriginalName    String          @db.VarChar(45)
-  ViewName        String          @db.VarChar(45)
+  OriginalName    String          @db.VarChar(400)
+  ViewName        String          @db.VarChar(400)
   Size            Int
   UserID          String          @db.VarChar(45)
   FileConvertedID String?         @db.VarChar(64)
@@ -80,35 +80,41 @@ model FilesConverted {
 }
 
 model Kiosks {
-  KioskID             String        @id @db.VarChar(45)
-  CreatedAt           DateTime      @db.DateTime(0)
-  ModifiedAt          DateTime      @db.DateTime(0)
-  IsDeleted           Int
-  Address             String        @db.VarChar(45)
-  Latitude            Float
-  Longitude           Float
-  BuildingCode        String        @db.VarChar(45)
-  LastConnectedAt     DateTime?     @db.DateTime(0)
-  MaintenancePasscode String        @db.VarChar(10)
-  Description         String        @db.VarChar(200)
-  Group               String        @db.VarChar(100)
-  ImageUrl            String?       @db.VarChar(300)
-  IsMonoPrintable     Int
-  IsColorPrintable    Int
-  IsDuplexPrintable   Int
-  MerchantID          String?       @db.VarChar(64)
-  RoughMapImageUrl    String?       @db.VarChar(45)
-  Name                String        @db.VarChar(45)
-  PricePerPage        Int           @db.UnsignedInt
-  Status              String        @db.VarChar(45)
-  Notice              String?       @db.VarChar(100)
-  WorkHour            String        @db.VarChar(45)
-  PaperTrayCapacity   Int           @db.UnsignedInt
-  NumRemainPaper      Int           @db.UnsignedInt
-  CurrentViewPage     String?       @db.VarChar(45)
-  Version             String?       @db.VarChar(45)
-  PrintJobs           PrintJobs[]
-  PrintOrders         PrintOrders[]
+  KioskID                 String                  @id @db.VarChar(45)
+  CreatedAt               DateTime                @db.DateTime(0)
+  ModifiedAt              DateTime                @db.DateTime(0)
+  IsDeleted               Int
+  Address                 String                  @db.VarChar(45)
+  Latitude                Float
+  Longitude               Float
+  BuildingCode            String                  @db.VarChar(45)
+  LastConnectedAt         DateTime?               @db.DateTime(0)
+  MaintenancePasscode     String                  @db.VarChar(10)
+  Description             String                  @db.VarChar(800)
+  KioskMaintenanceGroupID String?                 @db.VarChar(64)
+  Group                   String                  @db.VarChar(100)
+  ImageUrl                String?                 @db.VarChar(400)
+  IsDuplexPrintable       Int
+  MerchantID              String?                 @db.VarChar(64)
+  Name                    String                  @db.VarChar(45)
+  PriceA4Mono             Int?
+  PriceA4Color            Int?
+  BannerCustomHTML        String?                 @db.MediumText
+  Status                  String                  @db.VarChar(45)
+  Notice                  String?                 @db.VarChar(100)
+  WorkHour                String                  @db.VarChar(45)
+  PaperTrayCapacity       Int                     @db.UnsignedInt
+  NumRemainPaper          Int                     @db.UnsignedInt
+  CurrentViewPage         String?                 @db.VarChar(45)
+  Version                 String?                 @db.VarChar(45)
+  Memo                    String?                 @db.VarChar(400)
+  KioskMaintenanceGroups  KioskMaintenanceGroups? @relation(fields: [KioskMaintenanceGroupID], references: [KioskMaintenanceGroupID], onDelete: NoAction, onUpdate: NoAction, map: "Kiosks_FK")
+  Merchants               Merchants?              @relation(fields: [MerchantID], references: [MerchantID], onDelete: NoAction, onUpdate: NoAction, map: "Kiosks_FK_1")
+  PrintJobs               PrintJobs[]
+  PrintOrders             PrintOrders[]
+
+  @@index([KioskMaintenanceGroupID], map: "Kiosks_FK")
+  @@index([MerchantID], map: "Kiosks_FK_1")
 }
 
 model PointTransactions {
@@ -213,17 +219,19 @@ model Users {
   PrintOrders       PrintOrders[]
 }
 
-model KioskGroups {
-  KioskGroupID String  @id @db.VarChar(64)
-  Name         String  @db.VarChar(100)
-  Description  String? @db.VarChar(100)
-  MerchantID   String? @db.VarChar(100)
+model Merchants {
+  MerchantID     String   @id @db.VarChar(64)
+  Company        String   @db.VarChar(100)
+  Representative String   @db.VarChar(20)
+  PhoneNumber    String   @db.VarChar(50)
+  Description    String?  @db.VarChar(100)
+  Kiosks         Kiosks[]
 }
 
-model Merchants {
-  MerchantID     String  @id @db.VarChar(64)
-  Company        String  @db.VarChar(100)
-  Representative String  @db.VarChar(100)
-  PhoneNumber    String  @db.VarChar(100)
-  Description    String? @db.VarChar(100)
+model KioskMaintenanceGroups {
+  KioskMaintenanceGroupID String   @id @db.VarChar(64)
+  Name                    String   @db.VarChar(100)
+  Description             String?  @db.VarChar(100)
+  MerchantID              String?  @db.VarChar(100)
+  Kiosks                  Kiosks[]
 }
