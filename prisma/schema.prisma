@@ -12,6 +12,7 @@ model CardTransactions {
   CreatedAt         DateTime            @db.DateTime(0)
   Amount            Int
   CanceledAmount    Int
+  CanceledAt        DateTime?           @db.DateTime(0)
   RejectedReason    String?             @db.VarChar(100)
   CardID            String?             @db.VarChar(64)
   IamportUID        String              @db.VarChar(45)
@@ -79,35 +80,35 @@ model FilesConverted {
 }
 
 model Kiosks {
-  KioskID           String        @id @db.VarChar(45)
-  CreatedAt         DateTime      @db.DateTime(0)
-  ModifiedAt        DateTime      @db.DateTime(0)
-  IsDeleted         Int
-  Address           String        @db.VarChar(45)
-  Latitude          Float
-  Longitude         Float
-  BuildingCode      String        @db.VarChar(45)
-  LastConnectedAt   DateTime?     @db.DateTime(0)
-  MantenacePasscode String        @db.VarChar(10)
-  Description       String        @db.VarChar(200)
-  Group             String        @db.VarChar(100)
-  ImageUrl          String?       @db.VarChar(300)
-  IsMonoPrintable   Int
-  IsColorPrintable  Int
-  IsDuplexPrintable Int
-  ManagerID         String?       @db.VarChar(45)
-  RoughMapImageUrl  String?       @db.VarChar(45)
-  Name              String        @db.VarChar(45)
-  PricePerPage      Int           @db.UnsignedInt
-  Status            String        @db.VarChar(45)
-  Notice            String?       @db.VarChar(100)
-  WorkHour          String        @db.VarChar(45)
-  PaperTrayCapacity Int           @db.UnsignedInt
-  NumRemainPaper    Int           @db.UnsignedInt
-  CurrentViewPage   String?       @db.VarChar(45)
-  Version           String?       @db.VarChar(45)
-  PrintJobs         PrintJobs[]
-  PrintOrders       PrintOrders[]
+  KioskID             String        @id @db.VarChar(45)
+  CreatedAt           DateTime      @db.DateTime(0)
+  ModifiedAt          DateTime      @db.DateTime(0)
+  IsDeleted           Int
+  Address             String        @db.VarChar(45)
+  Latitude            Float
+  Longitude           Float
+  BuildingCode        String        @db.VarChar(45)
+  LastConnectedAt     DateTime?     @db.DateTime(0)
+  MaintenancePasscode String        @db.VarChar(10)
+  Description         String        @db.VarChar(200)
+  Group               String        @db.VarChar(100)
+  ImageUrl            String?       @db.VarChar(300)
+  IsMonoPrintable     Int
+  IsColorPrintable    Int
+  IsDuplexPrintable   Int
+  MerchantID          String?       @db.VarChar(64)
+  RoughMapImageUrl    String?       @db.VarChar(45)
+  Name                String        @db.VarChar(45)
+  PricePerPage        Int           @db.UnsignedInt
+  Status              String        @db.VarChar(45)
+  Notice              String?       @db.VarChar(100)
+  WorkHour            String        @db.VarChar(45)
+  PaperTrayCapacity   Int           @db.UnsignedInt
+  NumRemainPaper      Int           @db.UnsignedInt
+  CurrentViewPage     String?       @db.VarChar(45)
+  Version             String?       @db.VarChar(45)
+  PrintJobs           PrintJobs[]
+  PrintOrders         PrintOrders[]
 }
 
 model PointTransactions {
@@ -118,6 +119,7 @@ model PointTransactions {
   UserID             String            @db.VarChar(45)
   PointChanged       Int
   CanceledAmount     Int
+  CanceledAt         DateTime?         @db.DateTime(0)
   RemainingPoint     Int
   CardTransactions   CardTransactions? @relation(fields: [CardTransactionID], references: [CardTransactionID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PointTransactions_CardTransactions")
   Users              Users             @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PointTransactions_Users")
@@ -209,4 +211,19 @@ model Users {
   PointTransactions PointTransactions[]
   PrintJobs         PrintJobs[]
   PrintOrders       PrintOrders[]
+}
+
+model KioskGroups {
+  KioskGroupID String  @id @db.VarChar(64)
+  Name         String  @db.VarChar(100)
+  Description  String? @db.VarChar(100)
+  MerchantID   String? @db.VarChar(100)
+}
+
+model Merchants {
+  MerchantID     String  @id @db.VarChar(64)
+  Company        String  @db.VarChar(100)
+  Representative String  @db.VarChar(100)
+  PhoneNumber    String  @db.VarChar(100)
+  Description    String? @db.VarChar(100)
 }
