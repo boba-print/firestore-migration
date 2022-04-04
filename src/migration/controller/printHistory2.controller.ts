@@ -4,6 +4,7 @@ import { PrintHistory2 } from "../../interface/database";
 import { logger } from "../../logger";
 import { printHistory2MigrationService } from "../../migration/service/printHistory2.service";
 import { printJobService } from "../service/printJob.service";
+import delay from 'delay';
 
 export async function printHistory2MigrationController(
   snap: admin.firestore.DocumentSnapshot,
@@ -19,6 +20,7 @@ export async function printHistory2MigrationController(
   } catch (err) {
     logger.error(err);
   } finally {
+    await delay(30 * 1000);
     await printJobService.deleteRemainJobWhenPrintHistoryCreated(printHistory);
   }
 }
