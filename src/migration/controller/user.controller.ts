@@ -8,6 +8,9 @@ export async function userOnWriteController(
   context: functions.EventContext
 ) {
   const { before, after } = change;
+  if (!after.exists) {
+    return;
+  }
 
   logger.debug("Update from... to...", {
     before: before.data(),
@@ -29,4 +32,13 @@ export async function userOnWriteController(
       logger.error(err);
     }
   }
+}
+
+import { EventContext } from "firebase-functions";
+import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
+import { userUpdater } from "../updater/user.updater";
+
+export async function userOnDeleteController(snap: any, ctx: EventContext) {
+  const id = snap.id;
+  await userUpdater.setDeletedOrIgnoreWhenNotExist(id);
 }

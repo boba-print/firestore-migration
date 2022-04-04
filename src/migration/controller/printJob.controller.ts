@@ -7,6 +7,10 @@ export function printJobOnWriteController(
   ctx: functions.EventContext
 ) {
   const { before, after } = change;
+  if (!after.exists) {
+    return;
+  }
+  
   let printJob: PrintJob | null = null;
   if (before.exists) {
     printJob = before.data() as PrintJob;
@@ -21,4 +25,12 @@ export function printJobOnWriteController(
 
   const { uid, kioskJobUid } = printJob;
   printJobUpdater.update(uid, kioskJobUid);
+}
+
+import { EventContext } from "firebase-functions";
+import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
+
+export async function printJobOnDeleteController(snap: any, ctx: EventContext) {
+  const id = snap.id;
+  await printJobUpdater.setDeletedOrIgnoreWhenNotExist(id);
 }

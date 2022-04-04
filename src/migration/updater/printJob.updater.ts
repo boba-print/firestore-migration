@@ -80,6 +80,7 @@ class PrintJobUpdater extends Updater<PrintJob> {
 
     if(printJobRelation) {
       printJobRelation.IsDeleted = 1;
+      printJobRelation.ModifiedAt = new Date();
       await prisma.printJobs.update({
         where: {
           PrintJobID: uid,

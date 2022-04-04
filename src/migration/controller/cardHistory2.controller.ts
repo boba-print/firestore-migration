@@ -6,6 +6,10 @@ export async function cardHistory2OnWriteController(
   change: functions.Change<functions.firestore.DocumentSnapshot>,
   ctx: functions.EventContext
 ) {
+  if (!change.after.exists) {
+    return;
+  }
+
   const cardHistory = change.after.data();
   const uid = cardHistory.uid;
 
@@ -19,4 +23,15 @@ export async function cardHistory2OnWriteController(
   } catch (err) {
     logger.error(err);
   }
+}
+
+import { EventContext } from "firebase-functions";
+import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
+import { cardTransactionUpdater } from "../updater/cardTransaction.updater";
+export async function cardHistory2OnDeleteController(
+  snap: any,
+  ctx: EventContext
+) {
+  const id = snap.id;
+  await cardTransactionUpdater.setDeletedOrIgnoreWhenNotExist(id);
 }

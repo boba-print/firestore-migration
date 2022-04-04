@@ -8,6 +8,5 @@ export async function fileMigrationService(fileUid: string) {
     logger.warn("File to update not exists", { fileUid });
   }
 
-  await userUpdater.update(file.userUid);
-  await fileUpdater.update(file.uid);
+  await fileUpdater.update(fileUid);
 }

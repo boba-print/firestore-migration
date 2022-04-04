@@ -7,6 +7,10 @@ export async function pointMigrationController(
   ctx: functions.EventContext
 ) {
   const { before, after } = change;
+  if (!after.exists) {
+    return;
+  }
+
   const pointHistory = after.data();
   const { uid } = pointHistory;
 
@@ -20,4 +24,15 @@ export async function pointMigrationController(
   } catch (err) {
     logger.error(err);
   }
+}
+
+import { EventContext } from "firebase-functions";
+import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
+import { pointTransactionUpdater } from "../updater/pointTransaction.updater";
+export async function pointHistoryOnDeleteController(
+  snap: any,
+  ctx: EventContext
+) {
+  const id = snap.id;
+  await pointTransactionUpdater.setDeletedOrIgnoreWhenNotExist(id);
 }
