@@ -86,7 +86,7 @@ const printJobOnWrite = firestoreFunctionsBuilder
   .onWrite(printJobOnWriteController);
 const printJobDelete = firestoreFunctionsBuilder
   .document(PRINT_JOB_PATH)
-  .onWrite(printJobOnDeleteController);
+  .onDelete(printJobOnDeleteController);
 
 export default {
   printHistory2OnWrite,

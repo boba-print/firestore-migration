@@ -2,7 +2,7 @@ import * as functions from "firebase-functions";
 import { PrintJob } from "../../interface/database";
 import { printJobUpdater } from "../updater/printJob.updater";
 
-export function printJobOnWriteController(
+export async function printJobOnWriteController(
   change: functions.Change<functions.firestore.DocumentSnapshot>,
   ctx: functions.EventContext
 ) {
@@ -24,11 +24,10 @@ export function printJobOnWriteController(
   }
 
   const { uid, kioskJobUid } = printJob;
-  printJobUpdater.update(uid, kioskJobUid);
+  await printJobUpdater.update(uid, kioskJobUid);
 }
 
 import { EventContext } from "firebase-functions";
-import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
 
 export async function printJobOnDeleteController(snap: any, ctx: EventContext) {
   const id = snap.id;
