@@ -92,13 +92,13 @@ class PrintJobUpdater extends Updater<PrintJob> {
 
   // args[0]: kioskJobUid
   async update(uid: string, kioskJobUid: string): Promise<any> {
-    if (kioskJobUid !== "string") {
+    if (typeof kioskJobUid !== "string") {
       throw new Error("Need args[0]: kioskJobUid");
     }
 
     const printJob = await this.fetch(
       uid,
-      `kioskJobs/${kioskJobUid}/printJobs/${uid}`
+      `kioskJobs/${kioskJobUid}/printJobs`
     );
 
     if (printJob) {

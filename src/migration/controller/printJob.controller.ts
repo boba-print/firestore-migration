@@ -23,7 +23,8 @@ export async function printJobOnWriteController(
     throw new Error("Document to update not exists");
   }
 
-  const { uid, kioskJobUid } = printJob;
+  const { kioskJobUid } = ctx.params;
+  const { uid } = printJob;
   await printJobUpdater.update(uid, kioskJobUid);
 }
 

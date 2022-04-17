@@ -20,7 +20,7 @@ class KioskUpdater extends Updater<Kiosk> {
       Longitude: 127.2, // dummy
       BuildingCode: kiosk.buildingCode,
       LastConnectedAt: kiosk.connectedAt.toDate(),
-      MaintenancePasscode: '01234',
+      MaintenancePasscode: "01234",
       Description: kiosk.description,
       Group: kiosk.group,
       ImageUrl: kiosk.imageUrl,
@@ -33,6 +33,16 @@ class KioskUpdater extends Updater<Kiosk> {
       WorkHour: kiosk.workHour,
       PaperTrayCapacity: Number(kiosk.paperTrayCap),
       NumRemainPaper: kiosk.remainPaper,
+      KioskMaintenanceGroups: {
+        connect: {
+          KioskMaintenanceGroupID: "aba07246-0e81-4438-8cbc-105b1f5a9828",
+        },
+      },
+      Merchants: {
+        connect: {
+          MerchantID: "1735453f-72a7-4af8-b98a-230f8d14afd0",
+        },
+      },
     };
 
     await prisma.kiosks.upsert({
