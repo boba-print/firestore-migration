@@ -72,7 +72,7 @@ export async function printHistory2MigrationService(printHistoryUid: string) {
       PrintJobID: uuidv4(),
       CreatedAt: now,
       ModifiedAt: now,
-      IsDeleted: 0,
+      IsDeleted: 1,
       Kiosks: {
         connect: {
           KioskID: kioskUid,
