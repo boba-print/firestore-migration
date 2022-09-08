@@ -1,21 +1,50 @@
-import "reflect-metadata";
+import "dotenv/config";
+import { firestore } from "firebase-admin";
+import "../config";
 import fs from "fs/promises";
 import path from "path";
-import { plainToInstance } from "class-transformer";
+import admin from 'firebase-admin';
 import { UserFirestore } from "./schema/User.firestore";
-import { validate } from "class-validator";
-import admin from "firebase-admin";
 import { PrismaClient } from "@prisma/client";
-import { _databaseWithOptions } from "firebase-functions/v1/firestore";
-export const prisma = new PrismaClient();
+import { plainToInstance } from "class-transformer";
+import { validate } from "class-validator";
+
 
 (async () => {
+  // 유저 가져오기
   admin.initializeApp();
+  export const prisma = new PrismaClient();
 
+  const snap = await firestore().collection("users").get();
+  await fs.writeFile(
+    path.resolve(__dirname, "users.json"),
+    JSON.stringify(snap.docs.map((doc) => doc.data()))
+  );
+
+
+  // 스키마 검증
   const json = await fs.readFile(path.resolve(__dirname, "users.json"));
-  const users = JSON.parse(json.toString()) as UserFirestore[];
-  const errors = [];
+  const fromJson = JSON.parse(json.toString());
 
+  const users: UserFirestore[] = fromJson.map((user) =>
+    plainToInstance(UserFirestore, user)
+  );
+
+  const results = await Promise.all(
+    users.map(
+      async (uf) => await validate(uf, { skipMissingProperties: false })
+    )
+  );
+
+  const schemaErrors = results.filter((result) => result.length > 0);
+  console.log(schemaErrors.length);
+  fs.writeFile(
+    path.resolve(__dirname, "SchemaErrors.json"),
+    JSON.stringify(schemaErrors)
+  );
+  
+
+  const insertErrors = [];
   for (let i = 0; i < users.length; i++) {
     const user = users[i];
 
@@ -75,12 +104,11 @@ export const prisma = new PrismaClient();
         },
       });
     } catch (err) {
-      errors.push({ err: err.message, user });
+      insertErrors.push({ err: err.message, user });
     }
 
     fs.writeFile(
-      path.resolve(__dirname, "errors.json"),
-      JSON.stringify(errors)
+      path.resolve(__dirname, "InsertErrors.json"),
+      JSON.stringify(insertErrors)
     );
-  }
 })();

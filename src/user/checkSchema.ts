@@ -15,7 +15,9 @@ import { validate } from "class-validator";
   );
 
   const results = await Promise.all(
-    userFirestores.map(async (uf) => await validate(uf))
+    userFirestores.map(
+      async (uf) => await validate(uf, { skipMissingProperties: false })
+    )
   );
 
   const errors = results.filter((result) => result.length > 0);
