@@ -1,5 +1,5 @@
 export { Alarm } from './Alarm';
-export { Card } from './Card';
+export { CardFirestore as Card } from '../../card/CardFirestore';
 export { CardHistory } from './CardHistory';
 export { CardHistory2 } from './CardHistory2';
 export { File } from './File';

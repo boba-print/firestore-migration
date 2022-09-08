@@ -44,6 +44,7 @@ import { validate } from "class-validator";
   );
   
 
+  // DB 에 집어넣기
   const insertErrors = [];
   for (let i = 0; i < users.length; i++) {
     const user = users[i];

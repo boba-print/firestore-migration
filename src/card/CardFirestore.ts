@@ -1,7 +1,6 @@
-import firebase from 'firebase/app';
-import { Timestamp } from '../common/Timestamp';
+import { Timestamp } from '../interface/common/Timestamp';
 
-export interface Card {
+export interface CardFirestore {
   checkSum: string;
   maskedNumber: string;
   priority: number;
@@ -10,4 +9,6 @@ export interface Card {
   uid: string;
   vendorCode: string;
   vendorName: string;
+  // 커스텀 필드
+  userUid: string;
 }
