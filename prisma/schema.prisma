@@ -20,6 +20,7 @@ model CardTransactions {
   UserID            String              @db.VarChar(45)
   Cards             Cards?              @relation(fields: [CardID], references: [CardID], onDelete: NoAction, onUpdate: NoAction, map: "FK_CardTransactions_Cards")
   Users             Users               @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "FK_CardTransactions_Users")
+  Curator_Orders    Curator_Orders[]
   PointTransactions PointTransactions[]
   PrintOrders       PrintOrders[]
 
@@ -29,40 +30,44 @@ model CardTransactions {
 
 model Cards {
   CardID           String             @id @db.VarChar(64)
-  CreatedAt        DateTime           @db.DateTime(0)
-  ModifiedAt       DateTime           @db.DateTime(0)
+  CreatedAt        DateTime           @default(now()) @db.DateTime(0)
+  ModifiedAt       DateTime           @default(now()) @db.DateTime(0)
   IsDeleted        Int
   CheckSum         String             @db.VarChar(45)
   RejectionMessage String?            @db.VarChar(45)
   MaskedNumber     String             @db.VarChar(45)
   Priority         Int
   VendorCode       String             @db.VarChar(45)
-  BillingKey       String             @db.VarChar(45)
+  BillingKey       String             @db.VarChar(100)
   UserID           String             @db.VarChar(45)
   Users            Users              @relation(fields: [UserID], references: [UserID], onUpdate: Restrict, map: "FK_Cards_Users")
   CardTransactions CardTransactions[]
 
   @@index([UserID], map: "FK_Cards_Users_idx")
+  @@index([IsDeleted], map: "IsDeleted_idx")
 }
 
 model Files {
-  FileID          String          @id @db.VarChar(64)
-  CreatedAt       DateTime        @db.DateTime(0)
-  ModifiedAt      DateTime        @db.DateTime(0)
-  IsDeleted       Int
-  OriginalGSPath  String          @db.VarChar(300)
-  OriginalName    String          @db.VarChar(400)
-  ViewName        String          @db.VarChar(400)
-  Size            Int
-  UserID          String          @db.VarChar(45)
-  FileConvertedID String?         @db.VarChar(64)
-  ErrorType       String?         @db.VarChar(45)
-  FilesConverted  FilesConverted? @relation(fields: [FileConvertedID], references: [FileConvertedID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Files_FilesConverted")
-  Users           Users           @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Files_Users")
-  PrintJobs       PrintJobs[]
+  FileID                 String                   @id @db.VarChar(64)
+  CreatedAt              DateTime                 @db.DateTime(0)
+  ModifiedAt             DateTime                 @db.DateTime(0)
+  IsDeleted              Int
+  OriginalGSPath         String                   @db.VarChar(300)
+  OriginalName           String                   @db.VarChar(400)
+  ViewName               String                   @db.VarChar(400)
+  Size                   Int
+  UserID                 String                   @db.VarChar(45)
+  FileConvertedID        String?                  @db.VarChar(64)
+  ErrorType              String?                  @db.VarChar(45)
+  FilesConverted         FilesConverted?          @relation(fields: [FileConvertedID], references: [FileConvertedID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Files_FilesConverted")
+  Users                  Users                    @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Files_Users")
+  Curator_Board_File     Curator_Board_File[]
+  Curator_File_Ownership Curator_File_Ownership[]
+  PrintJobs              PrintJobs[]
 
   @@index([FileConvertedID], map: "FK_Files_FilesConverted_idx")
   @@index([UserID], map: "FK_Files_Users_idx")
+  @@index([IsDeleted], map: "IsDeleted_idx")
 }
 
 model FilesConverted {
@@ -72,8 +77,8 @@ model FilesConverted {
   NumPages            Int
   ThumbnailsGSPath    String   @db.VarChar(300)
   ConvertedFileGSPath String   @db.VarChar(300)
-  UserID              String   @db.VarChar(45)
-  Users               Users    @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "FK_FilesConverted_Users")
+  UserID              String   @db.VarChar(40)
+  Users               Users    @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "FK_FilesConverted_Users_idx")
   Files               Files[]
 
   @@index([UserID], map: "FK_FilesConverted_Users_idx")
@@ -109,10 +114,10 @@ model Kiosks {
   Memo                    String?                @db.VarChar(400)
   KioskMaintenanceGroupID String                 @db.VarChar(64)
   KioskMaintenanceGroups  KioskMaintenanceGroups @relation(fields: [KioskMaintenanceGroupID], references: [KioskMaintenanceGroupID], onDelete: NoAction, onUpdate: NoAction, map: "Kiosks_FK")
-  Merchants               Merchants              @relation(fields: [MerchantID], references: [MerchantID], onUpdate: Restrict, map: "Kiosks_FK_1")
-  PrintJobs               PrintJobs[]
-  PrintOrders             PrintOrders[]
+  Merchants               Merchants              @relation(fields: [MerchantID], references: [MerchantID], onDelete: NoAction, onUpdate: NoAction, map: "Kiosks_FK_1")
+  Kiosk_Search_Tag        Kiosk_Search_Tag[]
 
+  @@index([IsDeleted], map: "IsDeleted_idx")
   @@index([KioskMaintenanceGroupID], map: "Kiosks_FK")
   @@index([MerchantID], map: "Kiosks_FK_1")
 }
@@ -127,8 +132,9 @@ model PointTransactions {
   CanceledAmount     Int
   CanceledAt         DateTime?         @db.DateTime(0)
   RemainingPoint     Int
-  CardTransactions   CardTransactions? @relation(fields: [CardTransactionID], references: [CardTransactionID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PointTransactions_CardTransactions")
-  Users              Users             @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PointTransactions_Users")
+  CardTransactions   CardTransactions? @relation(fields: [CardTransactionID], references: [CardTransactionID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PointTransactions_CardTransactions_idx")
+  Users              Users             @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PointTransactions_Users_idx")
+  Curator_Orders     Curator_Orders[]
   PrintOrders        PrintOrders[]
 
   @@index([CardTransactionID], map: "FK_PointTransactions_CardTransactions_idx")
@@ -136,11 +142,12 @@ model PointTransactions {
 }
 
 model PrintJobs {
-  PrintJobID          String                @id @db.VarChar(40)
+  PrintJobID          String                @id @db.VarChar(64)
   CreatedAt           DateTime              @db.DateTime(0)
   ModifiedAt          DateTime              @db.DateTime(0)
+  ExpireAt            DateTime              @db.DateTime(0)
   IsDeleted           Int
-  KioskID             String                @db.VarChar(45)
+  PrintZoneID         String                @db.VarChar(45)
   UserID              String                @db.VarChar(45)
   FileID              String                @db.VarChar(64)
   NumPrintPages       Int?                  @db.UnsignedInt
@@ -154,22 +161,23 @@ model PrintJobs {
   IsColor             Int
   PageRanges          String                @db.VarChar(100)
   Files               Files                 @relation(fields: [FileID], references: [FileID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintJobs_Files")
-  Kiosks              Kiosks                @relation(fields: [KioskID], references: [KioskID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintJobs_Kiosks")
+  PrintZones          PrintZones            @relation(fields: [PrintZoneID], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintJobs_PrintZones")
   Users               Users                 @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintJobs_Users")
   PrintOrder_PrintJob PrintOrder_PrintJob[]
 
   @@index([FileID], map: "FK_PrintJobs_Files_idx")
-  @@index([KioskID], map: "FK_PrintJobs_Kiosks_idx")
+  @@index([PrintZoneID], map: "FK_PrintJobs_PrintZones_idx")
   @@index([UserID], map: "FK_PrintJobs_Users_idx")
+  @@index([IsDeleted], map: "IsDeleted_idx")
 }
 
 model PrintOrder_PrintJob {
   PrintOrderID String      @db.VarChar(64)
-  PrintJobID   String      @db.VarChar(45)
-  PrintJobs    PrintJobs   @relation(fields: [PrintJobID], references: [PrintJobID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintOrders_PrintJobs")
-  PrintOrders  PrintOrders @relation(fields: [PrintOrderID], references: [PrintOrderID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintJobs_PrintOrders")
+  PrintJobID   String      @db.VarChar(64)
+  PrintJobs    PrintJobs   @relation(fields: [PrintJobID], references: [PrintJobID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintOrders_PrintJobs_idx")
+  PrintOrders  PrintOrders @relation(fields: [PrintOrderID], references: [PrintOrderID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintJobs_PrintOrders_idx")
 
-  @@unique([PrintOrderID, PrintJobID], map: "CompositeKey")
+  @@id([PrintOrderID, PrintJobID])
   @@index([PrintOrderID], map: "FK_PrintJobs_PrintOrders_idx")
   @@index([PrintJobID], map: "FK_PrintOrders_PrintJobs_idx")
 }
@@ -181,42 +189,54 @@ model PrintOrders {
   IsDeleted           Int
   PointTransactionID  String?               @db.VarChar(64)
   CardTransactionID   String?               @db.VarChar(45)
-  KioskID             String                @db.VarChar(45)
+  PrintZoneID         String                @db.VarChar(64)
   Status              String                @db.VarChar(45)
   UserID              String                @db.VarChar(45)
-  CardTransactions    CardTransactions?     @relation(fields: [CardTransactionID], references: [CardTransactionID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintOrders_CardTransactions")
-  Kiosks              Kiosks                @relation(fields: [KioskID], references: [KioskID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintOrders_Kiosks")
-  PointTransactions   PointTransactions?    @relation(fields: [PointTransactionID], references: [PointTransactionID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintOrders_PointTransactions")
-  Users               Users                 @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintOrders_Users")
+  CardTransactions    CardTransactions?     @relation(fields: [CardTransactionID], references: [CardTransactionID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintOrders_CardTransactions_idx")
+  PointTransactions   PointTransactions?    @relation(fields: [PointTransactionID], references: [PointTransactionID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintOrders_PointTransactions_idx")
+  PrintZones          PrintZones            @relation(fields: [PrintZoneID], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintOrders_PrintZones_idx")
+  Users               Users                 @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PrintOrders_Users_idx")
   PrintOrder_PrintJob PrintOrder_PrintJob[]
 
   @@index([CardTransactionID], map: "FK_PrintOrders_CardTransactions_idx")
-  @@index([KioskID], map: "FK_PrintOrders_Kiosks_idx")
   @@index([PointTransactionID], map: "FK_PrintOrders_PointTransactions_idx")
+  @@index([PrintZoneID], map: "FK_PrintOrders_PrintZones_idx_idx")
   @@index([UserID], map: "FK_PrintOrders_Users_idx")
+  @@index([IsDeleted], map: "IsDeleted_idx")
 }
 
 model Users {
-  UserID            String              @id @db.VarChar(40)
-  CreatedAt         DateTime            @db.DateTime(0)
-  ModifiedAt        DateTime            @db.DateTime(0)
-  IsDeleted         Int
-  Email             String              @db.VarChar(100)
-  CheckedNoticeAt   DateTime?           @db.DateTime(0)
-  LastVisitedAt     DateTime?           @db.DateTime(0)
-  IsDisabled        Int
-  Name              String              @db.VarChar(45)
-  PhoneNumber       String              @db.VarChar(45)
-  Points            Int
-  StorageAllocated  BigInt              @db.UnsignedBigInt
-  StorageUsed       BigInt              @db.UnsignedBigInt
-  CardTransactions  CardTransactions[]
-  Cards             Cards[]
-  Files             Files[]
-  FilesConverted    FilesConverted[]
-  PointTransactions PointTransactions[]
-  PrintJobs         PrintJobs[]
-  PrintOrders       PrintOrders[]
+  UserID                                                       String                   @id @db.VarChar(40)
+  CreatedAt                                                    DateTime                 @db.DateTime(0)
+  ModifiedAt                                                   DateTime                 @db.DateTime(0)
+  IsDeleted                                                    Int
+  Email                                                        String                   @db.VarChar(100)
+  CheckedNoticeAt                                              DateTime?                @db.DateTime(0)
+  LastVisitedAt                                                DateTime?                @db.DateTime(0)
+  IsDisabled                                                   Int
+  Name                                                         String                   @db.VarChar(45)
+  PhoneNumber                                                  String                   @db.VarChar(45)
+  Points                                                       Int
+  StorageAllocated                                             Int                      @db.UnsignedInt
+  StorageUsed                                                  Int                      @db.UnsignedInt
+  Nickname                                                     String?                  @db.VarChar(32)
+  address                                                      String?                  @db.VarChar(400)
+  adress_detail                                                String?                  @db.VarChar(400)
+  CardTransactions                                             CardTransactions[]
+  Cards                                                        Cards[]
+  Coupons                                                      Coupons[]
+  Curator_Board                                                Curator_Board[]
+  Curator_File_Ownership                                       Curator_File_Ownership[]
+  Curator_Orders                                               Curator_Orders[]
+  Curator_Sue_Report_Curator_Sue_Report_sue_curator_idToUsers  Curator_Sue_Report[]     @relation("Curator_Sue_Report_sue_curator_idToUsers")
+  Curator_Sue_Report_Curator_Sue_Report_who_sue_user_idToUsers Curator_Sue_Report[]     @relation("Curator_Sue_Report_who_sue_user_idToUsers")
+  Files                                                        Files[]
+  FilesConverted                                               FilesConverted[]
+  PointTransactions                                            PointTransactions[]
+  PrintJobs                                                    PrintJobs[]
+  PrintOrders                                                  PrintOrders[]
+
+  @@index([IsDeleted], map: "IsDeleted_idx")
 }
 
 model Merchants {
@@ -227,15 +247,17 @@ model Merchants {
   Description            String?                  @db.VarChar(100)
   KioskMaintenanceGroups KioskMaintenanceGroups[]
   Kiosks                 Kiosks[]
+  PrintZone_Boba         PrintZone_Boba[]
 }
 
 model KioskMaintenanceGroups {
-  KioskMaintenanceGroupID String    @id @db.VarChar(64)
-  Name                    String    @db.VarChar(100)
-  Description             String    @db.VarChar(100)
-  MerchantID              String    @db.VarChar(64)
-  Merchants               Merchants @relation(fields: [MerchantID], references: [MerchantID], onDelete: NoAction, onUpdate: NoAction, map: "KioskMaintenanceGroups_FK")
+  KioskMaintenanceGroupID String           @id @db.VarChar(64)
+  Name                    String           @db.VarChar(100)
+  Description             String           @db.VarChar(100)
+  MerchantID              String           @db.VarChar(64)
+  Merchants               Merchants        @relation(fields: [MerchantID], references: [MerchantID], onDelete: NoAction, onUpdate: NoAction, map: "KioskMaintenanceGroups_FK")
   Kiosks                  Kiosks[]
+  PrintZone_Boba          PrintZone_Boba[]
 
   @@index([MerchantID], map: "KioskMaintenanceGroups_FK")
 }
@@ -244,7 +266,6 @@ model auth_group {
   id                     Int                      @id @default(autoincrement())
   name                   String                   @unique(map: "name") @db.VarChar(150)
   auth_group_permissions auth_group_permissions[]
-  auth_user_groups       auth_user_groups[]
 }
 
 model auth_group_permissions {
@@ -259,70 +280,30 @@ model auth_group_permissions {
 }
 
 model auth_permission {
-  id                         Int                          @id @default(autoincrement())
-  name                       String                       @db.VarChar(255)
-  content_type_id            Int
-  codename                   String                       @db.VarChar(100)
-  django_content_type        django_content_type          @relation(fields: [content_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_permission_content_type_id_2f476e4b_fk_django_co")
-  auth_group_permissions     auth_group_permissions[]
-  auth_user_user_permissions auth_user_user_permissions[]
+  id                     Int                      @id @default(autoincrement())
+  name                   String                   @db.VarChar(255)
+  content_type_id        Int
+  codename               String                   @db.VarChar(100)
+  django_content_type    django_content_type      @relation(fields: [content_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_permission_content_type_id_2f476e4b_fk_django_co")
+  auth_group_permissions auth_group_permissions[]
 
   @@unique([content_type_id, codename], map: "auth_permission_content_type_id_codename_01ab375a_uniq")
 }
 
-model auth_user {
-  id                         Int                          @id @default(autoincrement())
-  password                   String                       @db.VarChar(128)
-  last_login                 DateTime?                    @db.DateTime(6)
-  is_superuser               Boolean
-  username                   String                       @unique(map: "username") @db.VarChar(150)
-  first_name                 String                       @db.VarChar(150)
-  last_name                  String                       @db.VarChar(150)
-  email                      String                       @db.VarChar(254)
-  is_staff                   Boolean
-  is_active                  Boolean
-  date_joined                DateTime                     @db.DateTime(6)
-  auth_user_groups           auth_user_groups[]
-  auth_user_user_permissions auth_user_user_permissions[]
-  django_admin_log           django_admin_log[]
-}
-
-model auth_user_groups {
-  id         BigInt     @id @default(autoincrement())
-  user_id    Int
-  group_id   Int
-  auth_group auth_group @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_user_groups_group_id_97559544_fk_auth_group_id")
-  auth_user  auth_user  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_user_groups_user_id_6a12ed8b_fk_auth_user_id")
-
-  @@unique([user_id, group_id], map: "auth_user_groups_user_id_group_id_94350c0c_uniq")
-  @@index([group_id], map: "auth_user_groups_group_id_97559544_fk_auth_group_id")
-}
-
-model auth_user_user_permissions {
-  id              BigInt          @id @default(autoincrement())
-  user_id         Int
-  permission_id   Int
-  auth_permission auth_permission @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_user_user_permi_permission_id_1fbb5f2c_fk_auth_perm")
-  auth_user       auth_user       @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_user_user_permissions_user_id_a95ead1b_fk_auth_user_id")
-
-  @@unique([user_id, permission_id], map: "auth_user_user_permissions_user_id_permission_id_14a6b632_uniq")
-  @@index([permission_id], map: "auth_user_user_permi_permission_id_1fbb5f2c_fk_auth_perm")
-}
-
 model django_admin_log {
-  id                  Int                  @id @default(autoincrement())
-  action_time         DateTime             @db.DateTime(6)
-  object_id           String?              @db.LongText
-  object_repr         String               @db.VarChar(200)
-  action_flag         Int                  @db.UnsignedSmallInt
-  change_message      String               @db.LongText
-  content_type_id     Int?
-  user_id             Int
-  django_content_type django_content_type? @relation(fields: [content_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "django_admin_log_content_type_id_c4bce8eb_fk_django_co")
-  auth_user           auth_user            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "django_admin_log_user_id_c564eba6_fk_auth_user_id")
+  id                     Int                    @id @default(autoincrement())
+  action_time            DateTime               @db.DateTime(6)
+  object_id              String?                @db.LongText
+  object_repr            String                 @db.VarChar(200)
+  action_flag            Int                    @db.UnsignedSmallInt
+  change_message         String                 @db.LongText
+  content_type_id        Int?
+  user_id                BigInt
+  django_content_type    django_content_type?   @relation(fields: [content_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "django_admin_log_content_type_id_c4bce8eb_fk_django_co")
+  admin_console_bobauser admin_console_bobauser @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "django_admin_log_user_id_c564eba6_fk_admin_console_bobauser_id")
 
   @@index([content_type_id], map: "django_admin_log_content_type_id_c4bce8eb_fk_django_co")
-  @@index([user_id], map: "django_admin_log_user_id_c564eba6_fk_auth_user_id")
+  @@index([user_id], map: "django_admin_log_user_id_c564eba6_fk_admin_console_bobauser_id")
 }
 
 model django_content_type {
@@ -348,4 +329,475 @@ model django_session {
   expire_date  DateTime @db.DateTime(6)
 
   @@index([expire_date], map: "django_session_expire_date_a5c62663")
+}
+
+model AreaCode {
+  id            String          @id @db.VarChar(64)
+  ko_area_1     String          @db.VarChar(100)
+  ko_area_2     String?         @db.VarChar(100)
+  ko_area_3     String?         @db.VarChar(100)
+  en_area_1     String?         @db.VarChar(100)
+  en_area_2     String?         @db.VarChar(100)
+  en_area_3     String?         @db.VarChar(100)
+  en_area_4     String?         @db.VarChar(100)
+  Curator_Board Curator_Board[]
+  PrintZones    PrintZones[]
+
+  @@index([ko_area_1])
+  @@index([ko_area_2])
+  @@index([ko_area_3])
+}
+
+model Content_Images {
+  id                          String                        @id @db.VarChar(64)
+  created_at                  DateTime                      @default(now()) @db.DateTime(0)
+  url                         String                        @db.VarChar(400)
+  description                 String                        @default("") @db.VarChar(100)
+  description_en              String                        @default("") @db.VarChar(100)
+  Curator_Image               Curator_Image[]
+  Search_PrintZoneReply_Image Search_PrintZoneReply_Image[]
+  Search_PrintZone_Image      Search_PrintZone_Image[]
+}
+
+model Coupons {
+  CouponID    String    @id @db.VarChar(64)
+  CreatedAt   DateTime  @default(now()) @db.DateTime(0)
+  ModifiedAt  DateTime  @default(now()) @db.DateTime(0)
+  UsedAt      DateTime? @db.DateTime(0)
+  Name        String    @db.VarChar(40)
+  Description String    @db.VarChar(150)
+  Amount      Int       @db.UnsignedInt
+  UsedUserID  String?   @db.VarChar(40)
+  ExpireAt    DateTime  @db.DateTime(0)
+  Users       Users?    @relation(fields: [UsedUserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "Coupons_ibfk_1")
+
+  @@index([UsedUserID], map: "UsedUserID")
+}
+
+model Curator_Auth {
+  id   Int     @id
+  auth String? @default("user") @db.VarChar(45)
+}
+
+model Curator_Board {
+  id                 String                     @id @db.VarChar(64)
+  created_at         DateTime                   @default(now()) @db.DateTime(0)
+  updated_at         DateTime                   @default(now()) @db.DateTime(0)
+  writer_ip          String                     @db.VarChar(100)
+  title              String                     @db.VarChar(400)
+  author_key         String                     @db.VarChar(200)
+  price              Int
+  latitude           Float
+  longitude          Float
+  AreaCode_id        String                     @db.VarChar(64)
+  address_detail     String                     @db.VarChar(200)
+  descr_html         String?                    @db.MediumText
+  like               Int?                       @default(0)
+  read               Int?                       @default(0)
+  sue_blind          Curator_Board_sue_blind    @default(show)
+  price_switch       Curator_Board_price_switch @default(read)
+  AreaCode           AreaCode                   @relation(fields: [AreaCode_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Curator_Board_ibfk_1")
+  Users              Users                      @relation(fields: [author_key], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "Curator_Board_ibfk_2")
+  Curator_Board_File Curator_Board_File[]
+  Curator_Board_Tag  Curator_Board_Tag[]
+  Curator_Image      Curator_Image[]
+  Curator_Orders     Curator_Orders[]
+  Curator_Sue_Report Curator_Sue_Report[]
+
+  @@index([AreaCode_id], map: "AreaCode_id")
+  @@index([author_key], map: "author_key")
+}
+
+model Curator_Board_File {
+  id            Int           @id @default(autoincrement())
+  board_id      String        @db.VarChar(45)
+  file_id       String        @db.VarChar(45)
+  Curator_Board Curator_Board @relation(fields: [board_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Curator_Board_File_ibfk_1")
+  Files         Files         @relation(fields: [file_id], references: [FileID], onDelete: NoAction, onUpdate: NoAction, map: "Curator_Board_File_ibfk_2")
+
+  @@index([file_id], map: "Curator_Board_File_ibfk_2")
+  @@index([board_id], map: "board_id")
+}
+
+model Curator_Board_Tag {
+  board_id      String        @db.VarChar(64)
+  tag_id        String        @db.VarChar(64)
+  sort_num      Int?          @default(0)
+  Curator_Board Curator_Board @relation(fields: [board_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Curator_Board_Keyword_FK")
+  Curator_Tag   Curator_Tag   @relation(fields: [tag_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Curator_Board_Tag_FK")
+
+  @@id([board_id, tag_id])
+  @@index([tag_id], map: "Curator_Board_Keyword_FK1_idx")
+}
+
+model Curator_File_Ownership {
+  id        Int      @id @default(autoincrement())
+  FileID    String   @db.VarChar(64)
+  UserID    String   @db.VarChar(64)
+  IsDeleted Int?     @default(0)
+  CreatedAt DateTime @db.DateTime(0)
+  Files     Files    @relation(fields: [FileID], references: [FileID], onDelete: NoAction, onUpdate: NoAction, map: "OwnerShip_File_FK")
+  Users     Users    @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "OwnerShip_User_FK")
+
+  @@index([FileID], map: "OwnerShip_File_FK_idx")
+  @@index([UserID], map: "OwnerShip_User_FK_idx")
+}
+
+model Curator_Image {
+  id             Int            @id @default(autoincrement())
+  curator_id     String         @db.VarChar(64)
+  Image_id       String         @db.VarChar(64)
+  Content_Images Content_Images @relation(fields: [Image_id], references: [id], onDelete: Cascade, map: "curator_Image_FK_1")
+  Curator_Board  Curator_Board  @relation(fields: [curator_id], references: [id], onDelete: Cascade, map: "curator_Image_FK")
+
+  @@unique([curator_id, Image_id], map: "curator_Image_UN")
+  @@index([Image_id], map: "curator_Image_FK_1")
+}
+
+model Curator_Orders {
+  id                 String             @id @db.VarChar(64)
+  CreatedAt          DateTime           @db.DateTime(0)
+  ModifiedAt         DateTime           @db.DateTime(0)
+  IsDeleted          Int
+  PointTransactionID String?            @db.VarChar(64)
+  CardTransactionID  String?            @db.VarChar(45)
+  Status             String             @db.VarChar(45)
+  SellerID           String             @db.VarChar(64)
+  BuyerID            String             @db.VarChar(64)
+  BoardID            String             @db.VarChar(64)
+  Curator_Board      Curator_Board      @relation(fields: [BoardID], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_CuratorMarketOrder_CuratorBoard_idx")
+  CardTransactions   CardTransactions?  @relation(fields: [CardTransactionID], references: [CardTransactionID], onDelete: NoAction, onUpdate: NoAction, map: "FK_CuratorMarketOrder_CardTransactions_idx")
+  PointTransactions  PointTransactions? @relation(fields: [PointTransactionID], references: [PointTransactionID], onDelete: NoAction, onUpdate: NoAction, map: "FK_CuratorMarketOrder_PointTransactions_idx")
+  Users              Users              @relation(fields: [SellerID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "FK_CuratorMarketOrder_Users_idx_1")
+
+  @@index([CardTransactionID], map: "FK_CuratorMarketOrder_CardTransactions_idx")
+  @@index([BoardID], map: "FK_CuratorMarketOrder_CuratorBoard_idx")
+  @@index([PointTransactionID], map: "FK_CuratorMarketOrder_PointTransactions_idx")
+  @@index([SellerID], map: "FK_CuratorMarketOrder_Users_idx")
+  @@index([IsDeleted], map: "IsDeleted_idx")
+}
+
+model Curator_Sue_Report {
+  id                                              String         @id @db.VarChar(64)
+  who_sue_user_id                                 String?        @db.VarChar(64)
+  sue_curator_id                                  String?        @db.VarChar(64)
+  sue_date                                        DateTime?      @default(now()) @db.Timestamp(0)
+  sue_board_id                                    String?        @db.VarChar(64)
+  sue_text_id                                     String?        @db.VarChar(64)
+  text                                            String?        @db.VarChar(400)
+  Curator_Board                                   Curator_Board? @relation(fields: [sue_board_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Curator_Sue_Report_ibfk_3")
+  Users_Curator_Sue_Report_sue_curator_idToUsers  Users?         @relation("Curator_Sue_Report_sue_curator_idToUsers", fields: [sue_curator_id], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "Curator_Sue_Report_ibfk_2")
+  Users_Curator_Sue_Report_who_sue_user_idToUsers Users?         @relation("Curator_Sue_Report_who_sue_user_idToUsers", fields: [who_sue_user_id], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "Curator_Sue_Report_ibfk_1")
+
+  @@index([sue_board_id], map: "sue_board_id")
+  @@index([sue_curator_id], map: "sue_curator_id")
+  @@index([who_sue_user_id], map: "who_sue_user_id")
+}
+
+model Curator_Sue_Text {
+  id   Int     @id @default(autoincrement())
+  text String? @db.VarChar(300)
+}
+
+model Curator_Tag {
+  id                String              @id @unique(map: "id_UNIQUE") @db.VarChar(64)
+  tag               String              @db.VarChar(200)
+  date              DateTime?           @default(now()) @db.Timestamp(0)
+  weight            Int?                @default(0)
+  Curator_Board_Tag Curator_Board_Tag[]
+}
+
+model Kiosk_Search_Tag {
+  id         Int        @id
+  Kiosk_id   String     @db.VarChar(64)
+  Tag_id     String     @db.VarChar(64)
+  Kiosks     Kiosks     @relation(fields: [Kiosk_id], references: [KioskID], onDelete: NoAction, onUpdate: NoAction, map: "KioskTag_Kiosk_FK")
+  Search_Tag Search_Tag @relation(fields: [Tag_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "KioskTag_Tag_FK")
+
+  @@index([Kiosk_id], map: "KioskTag_Kiosk_idx")
+  @@index([Tag_id], map: "KioskTag_Tag_idx")
+  @@index([Kiosk_id], map: "Kiosk__FK_idx")
+  @@index([Tag_id], map: "Tag_FK_idx")
+}
+
+model Maintenance_Plan {
+  id          Int      @id @default(autoincrement())
+  start_at    String   @db.VarChar(100)
+  title       String?  @db.VarChar(100)
+  description String?  @db.VarChar(300)
+  created_at  DateTime @default(now()) @db.DateTime(0)
+  modified_at DateTime @default(now()) @db.DateTime(0)
+}
+
+model Notices {
+  NoticeID   String   @id @db.VarChar(40)
+  CreatedAt  DateTime @default(now()) @db.DateTime(0)
+  ModifiedAt DateTime @default(now()) @db.DateTime(0)
+  Title      String   @db.VarChar(100)
+  Content    String   @db.VarChar(300)
+  ImageUrl   String?  @db.VarChar(400)
+  ActionUrl  String?  @db.VarChar(400)
+  Priority   Int
+}
+
+model PhoneAuthSession {
+  PhoneAuthSessionID String    @id @db.VarChar(64)
+  CreatedAt          DateTime  @db.DateTime(0)
+  VerifiedAt         DateTime? @db.DateTime(0)
+  PhoneNumber        String    @db.VarChar(16)
+  VerifyNumber       String    @db.VarChar(10)
+
+  @@index([PhoneNumber], map: "PhoneNumber")
+  @@index([VerifyNumber], map: "VerifyNumber")
+}
+
+model PrintZone_Boba {
+  id                      Int                    @id @default(autoincrement())
+  group                   String                 @db.VarChar(100)
+  lastConnectedAt         DateTime?              @db.DateTime(0)
+  buildingCode            String                 @db.VarChar(45)
+  maintanancePasscode     String                 @db.VarChar(10)
+  notice                  String?                @db.VarChar(100)
+  isDuplexPrintable       Int
+  workHour                String                 @db.VarChar(45)
+  paperTrayCapacity       Int                    @db.UnsignedInt
+  numRemainPaper          Int                    @db.UnsignedInt
+  currentViewPage         String?                @db.VarChar(45)
+  version                 String?                @db.VarChar(45)
+  memo                    String?                @db.VarChar(400)
+  kioskMaintenanceGroupId String                 @db.VarChar(64)
+  merchant_id             String                 @db.VarChar(64)
+  KioskMaintenanceGroups  KioskMaintenanceGroups @relation(fields: [kioskMaintenanceGroupId], references: [KioskMaintenanceGroupID], onDelete: NoAction, onUpdate: NoAction, map: "Boba_KioskMaintenance_FK")
+  Merchants               Merchants              @relation(fields: [merchant_id], references: [MerchantID], onDelete: NoAction, onUpdate: NoAction, map: "Boba_Marchant_FK")
+  PrintZones              PrintZones[]
+
+  @@index([kioskMaintenanceGroupId], map: "Boba_KioskMaintenance_FK_idx")
+  @@index([merchant_id], map: "Boba_Marchant_FK_idx")
+}
+
+model PrintZones {
+  id                      String                    @id @db.VarChar(64)
+  created_at              DateTime                  @default(now()) @db.DateTime(0)
+  updated_at              DateTime                  @default(now()) @db.DateTime(0)
+  writer_ip               String                    @db.VarChar(100)
+  company                 String                    @db.VarChar(200)
+  latitude                Float
+  longitude               Float
+  phone_number            String?                   @db.VarChar(100)
+  AreaCode_id             String                    @db.VarChar(64)
+  address_detail          String                    @db.VarChar(200)
+  description             String                    @db.MediumText
+  banner_html             String?                   @db.MediumText
+  priority                String                    @default("basic") @db.VarChar(50)
+  status                  String                    @default("scrapped") @db.VarChar(50)
+  printZoneBoba_id        Int?
+  AreaCode                AreaCode                  @relation(fields: [AreaCode_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "PrintZones_FK")
+  PrintZone_Boba          PrintZone_Boba?           @relation(fields: [printZoneBoba_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "PrintZones_Boba_FK")
+  PrintJobs               PrintJobs[]
+  PrintOrders             PrintOrders[]
+  Search_PrintZoneReplies Search_PrintZoneReplies[]
+  Search_PrintZone_Image  Search_PrintZone_Image[]
+  Search_PrintZone_Tag    Search_PrintZone_Tag[]
+  Search_Services         Search_Services[]
+
+  @@index([printZoneBoba_id], map: "PrintZones_Boba_FK_idx")
+  @@index([AreaCode_id], map: "PrintZones_FK")
+  @@index([address_detail])
+  @@index([company])
+}
+
+model Search_Notices {
+  id            String   @id @db.VarChar(64)
+  created_at    DateTime @default(now()) @db.DateTime(0)
+  updated_at    DateTime @default(now()) @db.DateTime(0)
+  is_deleted    Int      @db.TinyInt
+  title         String   @db.VarChar(100)
+  type          String   @default("notice") @db.VarChar(20)
+  expose_main   Int      @default(0) @db.TinyInt
+  content_html  String   @db.MediumText
+  opengraph_url String?  @db.VarChar(400)
+
+  @@index([is_deleted], map: "IsDeleted_idx")
+}
+
+model Search_PaperSizes {
+  id              Int               @id @default(autoincrement())
+  created_at      DateTime          @default(now()) @db.DateTime(0)
+  updated_at      DateTime          @default(now()) @db.DateTime(0)
+  name            String            @db.VarChar(20)
+  name_en         String            @default("") @db.VarChar(20)
+  description     String            @default("") @db.VarChar(100)
+  Search_Services Search_Services[]
+}
+
+model Search_PaperTypes {
+  id              Int               @id @default(autoincrement())
+  created_at      DateTime          @default(now()) @db.DateTime(0)
+  updated_at      DateTime          @default(now()) @db.DateTime(0)
+  paper           String            @db.VarChar(20)
+  paper_en        String            @default("") @db.VarChar(20)
+  description     String            @db.VarChar(100)
+  Search_Services Search_Services[]
+}
+
+model Search_PrintZoneReplies {
+  id                          String                        @id @db.VarChar(64)
+  created_at                  DateTime                      @default(now()) @db.DateTime(0)
+  writer_ip                   String                        @db.VarChar(100)
+  writer_emoji                String                        @db.VarChar(10)
+  writer_name                 String                        @db.VarChar(40)
+  comment                     String                        @default("") @db.VarChar(800)
+  PrintZone_id                String                        @db.VarChar(64)
+  status                      String                        @default("posted") @db.VarChar(20)
+  reportCnt                   Int                           @default(0) @db.UnsignedInt
+  PrintZones                  PrintZones                    @relation(fields: [PrintZone_id], references: [id], onDelete: Cascade, map: "PrintZoneReplies_FK")
+  Search_PrintZoneReply_Image Search_PrintZoneReply_Image[]
+  Search_PrintZoneReply_Tag   Search_PrintZoneReply_Tag[]
+  Search_Services             Search_Services[]
+
+  @@index([PrintZone_id], map: "PrintZoneReplies_FK")
+}
+
+model Search_PrintZoneReply_Image {
+  id                      Int                     @id @default(autoincrement())
+  PrintZoneReply_id       String                  @db.VarChar(64)
+  Image_id                String                  @db.VarChar(64)
+  Content_Images          Content_Images          @relation(fields: [Image_id], references: [id], onDelete: Cascade, map: "PrintZoneReply_Image_FK")
+  Search_PrintZoneReplies Search_PrintZoneReplies @relation(fields: [PrintZoneReply_id], references: [id], onDelete: Cascade, map: "PrintZoneReply_Image_FK_1")
+
+  @@unique([PrintZoneReply_id, Image_id], map: "PrintZoneReply_Image_UN")
+  @@index([Image_id], map: "PrintZoneReply_Image_FK")
+  @@index([PrintZoneReply_id], map: "PrintZoneReply_Image_PrintZoneReply_id_IDX")
+}
+
+model Search_PrintZoneReply_Tag {
+  id                      Int                     @id @default(autoincrement())
+  PrintZoneReply_id       String                  @db.VarChar(64)
+  Tag_id                  String                  @db.VarChar(64)
+  Search_PrintZoneReplies Search_PrintZoneReplies @relation(fields: [PrintZoneReply_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "PrintZoneReply_Tag_FK")
+  Search_Tag              Search_Tag              @relation(fields: [Tag_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "PrintZoneReply_Tag_FK_1")
+
+  @@unique([PrintZoneReply_id, Tag_id], map: "PrintZoneReply_Tag_UN")
+  @@index([PrintZoneReply_id], map: "PrintZoneReply_Tag_PrintZoneReply_id_IDX")
+  @@index([Tag_id], map: "PrintZoneReply_Tag_Tag_id_IDX")
+}
+
+model Search_PrintZone_Image {
+  id             Int            @id @default(autoincrement())
+  PrintZone_id   String         @db.VarChar(64)
+  Image_id       String         @db.VarChar(64)
+  Content_Images Content_Images @relation(fields: [Image_id], references: [id], onDelete: Cascade, map: "PrintZone_Image_FK_1")
+  PrintZones     PrintZones     @relation(fields: [PrintZone_id], references: [id], onDelete: Cascade, map: "PrintZone_Image_FK")
+
+  @@unique([PrintZone_id, Image_id], map: "PrintZone_Image_UN")
+  @@index([Image_id], map: "PrintZone_Image_FK_1")
+}
+
+model Search_PrintZone_Tag {
+  id           Int        @id @default(autoincrement())
+  PrintZone_id String     @db.VarChar(64)
+  Tag_id       String     @db.VarChar(64)
+  PrintZones   PrintZones @relation(fields: [PrintZone_id], references: [id], onDelete: Cascade, map: "PrintZone_Tag_FK")
+  Search_Tag   Search_Tag @relation(fields: [Tag_id], references: [id], onDelete: Cascade, map: "PrintZone_Tag_FK_1")
+
+  @@unique([PrintZone_id, Tag_id], map: "PrintZone_Tag_UN")
+  @@index([Tag_id], map: "PrintZone_Tag_FK_1")
+}
+
+model Search_ServiceType {
+  id              Int               @id @default(autoincrement())
+  created_at      DateTime          @default(now()) @db.DateTime(0)
+  updated_at      DateTime          @default(now()) @db.DateTime(0)
+  type            String            @db.VarChar(20)
+  type_en         String            @default("") @db.VarChar(20)
+  description     String            @default("") @db.VarChar(100)
+  Search_Services Search_Services[]
+}
+
+model Search_Services {
+  id                      String                   @id @db.VarChar(64)
+  created_at              DateTime                 @default(now()) @db.DateTime(0)
+  updated_at              DateTime                 @default(now()) @db.DateTime(0)
+  PrintZone_id            String                   @db.VarChar(64)
+  PaperSize_id            Int
+  PaperType_id            Int
+  ServiceType_id          Int
+  color_type              String                   @default("color") @db.VarChar(64)
+  price                   Int                      @db.UnsignedInt
+  price_duplex_explicit   Int?                     @db.UnsignedInt
+  proposed_reply          String?                  @db.VarChar(64)
+  status                  String                   @db.VarChar(20)
+  Search_PaperSizes       Search_PaperSizes        @relation(fields: [PaperSize_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Price_FK")
+  Search_PaperTypes       Search_PaperTypes        @relation(fields: [PaperType_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Price_FK_1")
+  PrintZones              PrintZones               @relation(fields: [PrintZone_id], references: [id], onDelete: Cascade, map: "Services_FK_2")
+  Search_ServiceType      Search_ServiceType       @relation(fields: [ServiceType_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Services_FK")
+  Search_PrintZoneReplies Search_PrintZoneReplies? @relation(fields: [proposed_reply], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Services_FK_1")
+
+  @@index([PaperType_id], map: "Price_FK_1_idx")
+  @@index([PaperSize_id], map: "Price_FK_idx")
+  @@index([proposed_reply], map: "Services_FK_1")
+  @@index([PrintZone_id], map: "Services_FK_2")
+  @@index([ServiceType_id], map: "Services_FK_idx")
+}
+
+model Search_Tag {
+  id                        String                      @id @db.VarChar(64)
+  created_at                DateTime                    @default(now()) @db.DateTime(0)
+  weight                    Int                         @default(10)
+  value                     String                      @db.VarChar(40)
+  search_engine_expose      Int                         @default(0) @db.TinyInt
+  TagType_id                String                      @default("8690c5dd-4246-49bc-9ac1-f9b32eb9a300") @db.VarChar(64)
+  Search_TagTypes           Search_TagTypes             @relation(fields: [TagType_id], references: [id], onUpdate: Restrict, map: "Tag_FK")
+  Kiosk_Search_Tag          Kiosk_Search_Tag[]
+  Search_PrintZoneReply_Tag Search_PrintZoneReply_Tag[]
+  Search_PrintZone_Tag      Search_PrintZone_Tag[]
+
+  @@index([TagType_id], map: "Tag_FK")
+  @@index([value], map: "Tag_value_idx")
+}
+
+model Search_TagTypes {
+  id         String       @id @db.VarChar(64)
+  type       String       @db.VarChar(20)
+  Search_Tag Search_Tag[]
+}
+
+model UsersDeleted {
+  UserID           String    @id @db.VarChar(40)
+  CreatedAt        DateTime  @db.DateTime(0)
+  ModifiedAt       DateTime  @db.DateTime(0)
+  IsDeleted        Int
+  Email            String    @db.VarChar(100)
+  CheckedNoticeAt  DateTime? @db.DateTime(0)
+  LastVisitedAt    DateTime? @db.DateTime(0)
+  IsDisabled       Int
+  Name             String    @db.VarChar(45)
+  PhoneNumber      String    @db.VarChar(45)
+  Points           Int
+  StorageAllocated Int?      @db.UnsignedInt
+  StorageUsed      Int?      @db.UnsignedInt
+  Nickname         String?   @db.VarChar(32)
+  address          String?   @db.VarChar(400)
+  adress_detail    String?   @db.VarChar(400)
+}
+
+model admin_console_bobauser {
+  id               BigInt             @id @default(autoincrement())
+  password         String             @db.VarChar(128)
+  last_login       DateTime?          @db.DateTime(6)
+  email            String             @unique(map: "email") @db.VarChar(255)
+  is_active        Boolean
+  is_admin         Boolean
+  merchantid       String?            @unique(map: "admin_console_bobauser_merchantid_781cf7ff_uniq") @db.VarChar(36)
+  django_admin_log django_admin_log[]
+}
+
+enum Curator_Board_sue_blind {
+  blind
+  show
+}
+
+enum Curator_Board_price_switch {
+  purchase
+  read
 }
